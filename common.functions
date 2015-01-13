@@ -1,0 +1,7 @@
+#!/bin/env ruby
+# encoding: utf-8
+
+#фиксируем время начала выполнения теста
+def time()
+  time = Time.now.strftime("%d/%m/%Y %H:%M:%S")
+end

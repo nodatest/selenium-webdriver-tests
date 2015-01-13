@@ -1,0 +1,13 @@
+#!/bin/env ruby
+# encoding: utf-8
+
+#Проверка на noindex
+def test1()
+  #задаём адрес ссылки
+  link = "http://4mycar.ru/parts/Febi/01089"
+  #переходим по ссылке
+  @driver.navigate.to link
+  result = @driver.find_elements(:xpath, "//comment()[contains(.,'noindex')]").count
+  puts result
+end
+

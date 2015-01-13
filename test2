@@ -1,0 +1,31 @@
+#!/bin/env ruby
+# encoding: utf-8
+#Нет редиректа, доступны результаты
+
+def test2()
+
+    #задаём адрес ссылки
+    link = "http://4mycar.ru/parts/Liqui%20moly/3970"
+
+    #переходим по ссылке
+    @driver.navigate.to link
+
+    #проверяем, что нет редиректа
+    if @driver.current_url == link then
+      puts time+': Редиректа нет'
+    else
+      puts time+': Ошибка! Редирект есть!'
+    end
+
+    #проверяем наличие на странице результатов
+    begin
+      result = @driver.find_element(:id, 'searchResultsDiv').nil?
+    rescue
+    end
+
+    if result == false then
+      puts time+': Результаты есть'
+    else
+      puts time+': Ошибка! Результатов нет!'
+    end
+  end
