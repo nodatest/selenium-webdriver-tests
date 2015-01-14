@@ -7,11 +7,13 @@ load './test3-4'
 load './common.functions'
 
 require "selenium-webdriver"
+
+def chooseBrowser(ver)
 @client = Selenium::WebDriver::Remote::Http::Default.new
 @client.timeout = 120 # seconds
-@driver = Selenium::WebDriver.for(:chrome, :http_client => @client) #chrome
+@driver = Selenium::WebDriver.for(:"#{ver}", :http_client => @client)
 
-puts time+" ----- Chrome -----"
+puts time+" ----- "+ver+" -----"
 
 #test1()
 
@@ -22,20 +24,9 @@ test3()
 test4()
 
 @driver.quit
+end
 
-
-@client = Selenium::WebDriver::Remote::Http::Default.new
-@client.timeout = 120 # seconds
-@driver = Selenium::WebDriver.for(:ff, :http_client => @client) #firefox
-
-puts time+" ----- Firefox -----"
-
-#test1()
-
-test2()
-
-test3()
-
-test4()
-
-@driver.quit
+#запускаем chrome
+chooseBrowser('chrome')
+#запускаем firefox
+chooseBrowser('firefox')
