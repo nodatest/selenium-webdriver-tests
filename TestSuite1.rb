@@ -15,7 +15,7 @@ def chooseBrowser(ver)
 
 puts time+" ----- "+ver+" -----"
 
-#test1()
+test1()
 
 test2()
 
