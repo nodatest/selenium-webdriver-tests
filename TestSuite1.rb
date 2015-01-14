@@ -26,7 +26,15 @@ test4()
 @driver.quit
 end
 
-#запускаем chrome
-chooseBrowser('chrome')
-#запускаем firefox
-chooseBrowser('firefox')
+#таймер
+loop {
+  time = Time.new.min
+  if time == 0 then
+    #запускаем chrome
+    chooseBrowser('chrome')
+    #запускаем firefox
+    chooseBrowser('firefox')
+  else
+    sleep 60
+  end
+}
