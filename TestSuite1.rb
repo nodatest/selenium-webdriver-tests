@@ -8,12 +8,16 @@ load './common.functions'
 
 require "selenium-webdriver"
 
+#выводим ошибки ruby в файл
+$stderr = File.open("../selenium-webdriver-logs/!errors_log.txt", "w")
+
 def chooseBrowser(ver)
 @client = Selenium::WebDriver::Remote::Http::Default.new
 @client.timeout = 120 # seconds
 @driver = Selenium::WebDriver.for(:"#{ver}", :http_client => @client)
 
-puts time+" ----- "+ver+" -----"
+#лог выполнения тестов
+  $stdout = File.open("../selenium-webdriver-logs/#{ver}_#{date}.txt", "a")
 
 test1()
 
@@ -34,7 +38,10 @@ loop {
     chooseBrowser('chrome')
     #запускаем firefox
     chooseBrowser('firefox')
+    #закрываем файл лога
+    $stdout.close
   else
+    #ждём 60 сек
     sleep 60
   end
 }

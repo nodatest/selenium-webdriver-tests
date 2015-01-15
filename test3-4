@@ -21,9 +21,9 @@ def test3()
       #проверяем наличие noindex, nofollow на странице
       result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
       if result == 1 then
-        puts time+': noindex [tecdoc] присутствует. ссылка: '+link
+        puts time+' test3: noindex [tecdoc] присутствует. ссылка: '+link
       else
-        puts time+': Ошибка! noindex [tecdoc] отсутствует. ссылка: '+link
+        puts time+' test3: Ошибка! noindex [tecdoc] отсутствует. ссылка: '+link
       end
     end
   end
@@ -41,9 +41,9 @@ def test4()
     #проверяем наличие noindex, nofollow на странице
     result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
     if result == 0 then
-      puts time+': noindex [4mycar] отсутствует. ссылка: '+link
+      puts time+' test4: noindex [4mycar] отсутствует. ссылка: '+link
     else
-      puts time+': Ошибка! noindex [4mycar] присутствует. ссылка: '+link
+      puts time+' test4: Ошибка! noindex [4mycar] присутствует. ссылка: '+link
     end
   end
 end

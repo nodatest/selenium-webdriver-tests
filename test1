@@ -22,9 +22,9 @@ def test1()
   end
 
   if result == false then
-    puts time+': noindex в результатах нет'
+    puts time+' test1: noindex в результатах нет'
   else
-    puts time+': Ошибка! noindex в результатах есть!'
+    puts time+' test1: Ошибка! noindex в результатах есть!'
   end
 end
 

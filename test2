@@ -12,9 +12,9 @@ def test2()
 
     #проверяем, что нет редиректа
     if @driver.current_url == link then
-      puts time+': Редиректа нет'
+      puts time+' test2: Редиректа нет'
     else
-      puts time+': Ошибка! Редирект есть!'
+      puts time+' test2: Ошибка! Редирект есть!'
     end
 
     #проверяем наличие на странице результатов
@@ -24,8 +24,8 @@ def test2()
     end
 
     if result == false then
-      puts time+': Результаты есть'
+      puts time+' test2: Результаты есть'
     else
-      puts time+': Ошибка! Результатов нет!'
+      puts time+' test2: Ошибка! Результатов нет!'
     end
   end
