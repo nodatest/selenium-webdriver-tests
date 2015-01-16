@@ -23,25 +23,22 @@ test1()
 
 test2()
 
-test3()
+#test3()
 
-test4()
+#test4()
+
+#закрываем файл лога
+  $stdout.flush
 
 @driver.quit
 end
 
 #таймер
 loop {
-  time = Time.new.min
-  if time == 0 then
     #запускаем chrome
     chooseBrowser('chrome')
     #запускаем firefox
     chooseBrowser('firefox')
-    #закрываем файл лога
-    $stdout.close
-  else
-    #ждём 60 сек
-    sleep 60
-  end
+    #ждём 1 час
+    sleep 3600
 }
