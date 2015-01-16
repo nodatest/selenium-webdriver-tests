@@ -8,9 +8,8 @@ require_relative 'test2'
 require_relative 'test3-4'
 require_relative 'common.functions'
 
-=begin
+
 loop {
   #ждём 1 час
   sleep 3600
 }
-=end
