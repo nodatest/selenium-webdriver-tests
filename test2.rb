@@ -5,22 +5,22 @@ require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Нет редиректа, доступны результаты
-def test2(ver)
+def test2(browser)
 
   #задаём адрес ссылки
-  link = 'http://4mycar.ru/parts/Liqui%20moly/3970'
+  link = "http://4mycar.ru#{@lan.to_s}/parts/Liqui%20moly/3970"
 
   #переходим по ссылке
   @driver.navigate.to link
 
   #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{ver}_#{date}.txt", 'a')
+  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
 
   #проверяем, что нет редиректа
   if @driver.current_url == link then
-    puts time+' test2: Редиректа нет'
+    puts "#{time} test2: Редиректа нет"
   else
-    puts time+' test2: Ошибка! Редирект есть!'
+    puts "#{time} test2: Ошибка! Редирект есть!"
   end
 
   #проверяем наличие на странице результатов
@@ -29,13 +29,9 @@ def test2(ver)
   rescue
   end
 
-  if result == false then
-    puts time+' test2: Результаты есть'
+  if (!result) then
+    puts "#{time} test2: Результаты есть"
   else
-    puts time+' test2: Ошибка! Результатов нет!'
+    puts "#{time} test2: Ошибка! Результатов нет!"
   end
 end
-
-#запускаем себя
-startTest(2, 'chrome')
-startTest(2, 'firefox')

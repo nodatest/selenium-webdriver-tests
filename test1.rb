@@ -5,10 +5,10 @@ require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Проверки на noindex
-def test1(ver)
+def test1(browser)
 
   #задаём адрес ссылки
-  link = 'http://4mycar.ru/parts/Febi/01089'
+  link = "http://4mycar.ru#{@lan.to_s}/parts/Febi/01089"
 
   #переходим по ссылке
   @driver.navigate.to link
@@ -26,18 +26,14 @@ def test1(ver)
   end
 
   #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{ver}_#{date}.txt", 'a')
+  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
 
-  if result == false then
-    puts time+' test1: noindex в результатах нет'
+  if (!result) then
+    puts "#{time} test1: noindex в результатах нет"
   else
-    puts time+' test1: Ошибка! noindex в результатах есть!'
+    puts "#{time} test1: Ошибка! noindex в результатах есть!"
   end
 end
-
-#запускаем себя
-startTest(1, 'chrome')
-startTest(1, 'firefox')
 
 
 
