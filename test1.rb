@@ -28,7 +28,7 @@ def test1(browser)
   #лог выполнения тестов
   $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
 
-  if (!result) then
+  if !result then
     puts "#{time} test1: noindex в результатах нет"
   else
     puts "#{time} test1: Ошибка! noindex в результатах есть!"

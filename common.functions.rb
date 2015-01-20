@@ -12,15 +12,17 @@ def date
 end
 
 def startTest(number, browser)
-  @client = Selenium::WebDriver::Remote::Http::Default.new
-  @client.timeout = 120 # seconds
 
   #проверяем указан ли браузер
   if browser == nil
     browser = 'chrome'
   end
 
-  @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
+  if @options[:browser].to_s.nil? == true
+    @client = Selenium::WebDriver::Remote::Http::Default.new
+    @client.timeout = 120 # seconds
+    @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
+  end
 
   #вызываем нужный номер теста и нужный браузер
   send("test#{number}".to_sym, browser)
@@ -29,7 +31,9 @@ def startTest(number, browser)
   $stdout.flush
 
   #выходим из браузера
-  @driver.quit
+  if @options[:browser].to_s.nil? == true
+    @driver.quit
+  end
 end
 
 #параметры в командной строке
@@ -38,14 +42,12 @@ def options
   OptionParser.new do |opts|
     opts.banner = 'Usage: example.rb [options]'
 
-    opts.on('-b', '--browser NAME', 'browser') { |b| @options[:browser] = b }
-    opts.on('-l', '--lan', 'lan') { |l| @options[:lan] = l }
+    opts.on('-a', '--all-tests-in-one-browser', 'all tests in one browser') { |a| @options[:aio] = a }
+    opts.on('-l', '--lan', 'use local code') { |l| @options[:lan] = l }
     opts.on('-n', '--number N', 'test number') { |n| @options[:number] = n }
   end.parse!
 
-  if @options[:lan] == true
+  if @options[:lan] == false
     @lan = '.lan'
   end
-
-
 end
