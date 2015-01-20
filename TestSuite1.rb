@@ -12,46 +12,32 @@ $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
 #обрабатываем параметры командной строки
 options
 
+#задаём массив браузеров
+browsers = %w(chrome firefox)
+
+
 if @options[:number].nil? == false
   startTest(@options[:number], 'chrome')
 else
   loop {
-    if @options[:aio].to_s.nil? == false
-      @client = Selenium::WebDriver::Remote::Http::Default.new
-      @client.timeout = 120 # seconds
-      browser = 'chrome'
-      @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
+    for i in 0 ... browsers.size
+      if @options[:aio] == true
+        @client = Selenium::WebDriver::Remote::Http::Default.new
+        @client.timeout = 120 # seconds
+        @driver = Selenium::WebDriver.for(:"#{browsers[i]}", :http_client => @client)
+      end
+
+      #запускаем тесты в различных браузерах
+      startTest(1, browsers[i])
+      startTest(2, browsers[i])
+      startTest(3, browsers[i])
+      startTest(4, browsers[i])
+
+      #выходим из браузера
+      if @options[:aio] == true
+        @driver.quit
+      end
     end
-
-    #тесты в хроме
-    startTest(1, 'chrome')
-    startTest(2, 'chrome')
-    startTest(3, 'chrome')
-    startTest(4, 'chrome')
-
-    #выходим из браузера
-    if @options[:aio].to_s.nil? == false
-      @driver.quit
-    end
-
-    if @options[:aio].to_s.nil? == false
-      @client = Selenium::WebDriver::Remote::Http::Default.new
-      @client.timeout = 120 # seconds
-      browser = 'firefox'
-      @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
-    end
-
-    #тесты в firefox
-    startTest(1, 'firefox')
-    startTest(2, 'firefox')
-    startTest(3, 'firefox')
-    startTest(4, 'firefox')
-
-    #выходим из браузера
-    if @options[:aio].to_s.nil? == false
-      @driver.quit
-    end
-
     #ждём 1 час
     sleep 3600
   }

@@ -18,7 +18,7 @@ def startTest(number, browser)
     browser = 'chrome'
   end
 
-  if @options[:browser].to_s.nil? == true
+  if @options[:aio].nil? == true
     @client = Selenium::WebDriver::Remote::Http::Default.new
     @client.timeout = 120 # seconds
     @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
@@ -31,7 +31,7 @@ def startTest(number, browser)
   $stdout.flush
 
   #выходим из браузера
-  if @options[:browser].to_s.nil? == true
+  if @options[:aio].nil? == true
     @driver.quit
   end
 end
@@ -47,7 +47,7 @@ def options
     opts.on('-n', '--number N', 'test number') { |n| @options[:number] = n }
   end.parse!
 
-  if @options[:lan] == false
+  if @options[:lan] == true
     @lan = '.lan'
   end
 end
