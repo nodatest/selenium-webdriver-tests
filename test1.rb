@@ -25,9 +25,6 @@ def test1(browser)
   rescue
   end
 
-  #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
-
   if !result then
     puts "#{time} test1: noindex в результатах нет"
   else

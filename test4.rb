@@ -13,8 +13,6 @@ def test4(sites = @sites, pages = @pages, browser)
     @driver.navigate.to link
     #удаляем все куки
     @driver.manage.delete_all_cookies
-    #лог выполнения тестов
-    $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
     #проверяем наличие noindex, nofollow на странице
     result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
     if (result == 0) then

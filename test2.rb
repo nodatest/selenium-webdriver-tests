@@ -13,9 +13,6 @@ def test2(browser)
   #переходим по ссылке
   @driver.navigate.to link
 
-  #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
-
   #проверяем, что нет редиректа
   if @driver.current_url == link then
     puts "#{time} test2: Редиректа нет"

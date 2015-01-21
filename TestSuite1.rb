@@ -1,4 +1,4 @@
-require 'selenium-webdriver'
+require 'selenium-webdriver.rb'
 require_relative 'test1'
 require_relative 'test2'
 require_relative 'test3'
@@ -15,8 +15,9 @@ options
 #задаём массив браузеров
 browsers = %w(chrome firefox)
 
-
 if @options[:number].nil? == false
+  #лог выполнения тестов
+  $stdout = File.open("../selenium-webdriver-logs/chrome_#{date}.txt", 'a')
   startTest(@options[:number], 'chrome')
 else
   loop {
@@ -26,6 +27,9 @@ else
         @client.timeout = 120 # seconds
         @driver = Selenium::WebDriver.for(:"#{browsers[i]}", :http_client => @client)
       end
+
+      #лог выполнения тестов
+      $stdout = File.open("../selenium-webdriver-logs/#{browsers[i]}_#{date}.txt", 'a')
 
       #запускаем тесты в различных браузерах
       startTest(1, browsers[i])
@@ -38,6 +42,7 @@ else
         @driver.quit
       end
     end
+
     #ждём 1 час
     sleep 3600
   }
