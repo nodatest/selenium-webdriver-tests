@@ -10,7 +10,7 @@ require_relative 'common.functions'
 @pages = %w(page=catalog page=catalog&man=16 page=catalog&man=16&model=6414 page=catalog&man=16&model=6414&modelVariant=31960 page=catalog&man=16&model=6414&modelVariant=31960&group=100384 search_type=&pcode=oc90 pbrandnumber=OC90&pbrandname=Knecht page=carbase page=carbase&manufacturerId=15 page=carbase&modelId=1207 page=carbase&modificationId=13073 page=goods_catalog&action=search&goods_group=tires page=goods_catalog&action=search&goods_group=disks page=goods_info&brand=ABT&number=FCR1985351257DM)
 
 #Проверка сервисных cайтов на наличие noindex [tecdoc]
-def test3(sites = @sites, pages = @pages, browser)
+def servicesitesnoindexexistence(sites = @sites, pages = @pages, browser)
   for index1 in 1 ... sites.size
     for index2 in 0 ... pages.size
       link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"

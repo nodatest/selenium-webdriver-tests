@@ -15,10 +15,10 @@ options
 #задаём массив браузеров
 browsers = %w(chrome firefox)
 
-if @options[:number].nil? == false
+if @options[:name].nil? == false
   #лог выполнения тестов
   $stdout = File.open("../selenium-webdriver-logs/chrome_#{date}.txt", 'a')
-  startTest(@options[:number], 'chrome')
+  startTest(@options[:name], 'chrome')
 else
   loop {
     for i in 0 ... browsers.size
@@ -32,10 +32,10 @@ else
       $stdout = File.open("../selenium-webdriver-logs/#{browsers[i]}_#{date}.txt", 'a')
 
       #запускаем тесты в различных браузерах
-      startTest(1, browsers[i])
-      startTest(2, browsers[i])
-      startTest(3, browsers[i])
-      startTest(4, browsers[i])
+      startTest('formycarnoindexexistence', browsers[i])
+      startTest('formycarnoredirectandavailableresults', browsers[i])
+      startTest('servicesitesnoindexexistence', browsers[i])
+      startTest('formycarnoindexmiss', browsers[i])
 
       #выходим из браузера
       if @options[:aio] == true

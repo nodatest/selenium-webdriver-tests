@@ -5,7 +5,7 @@ require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Нет редиректа, доступны результаты
-def test2(browser)
+def formycarnoredirectandavailableresults(browser)
 
   #задаём адрес ссылки
   link = "http://4mycar.ru#{@lan.to_s}/parts/Liqui%20moly/3970"

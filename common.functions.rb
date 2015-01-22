@@ -11,7 +11,8 @@ def date
   date = time[0, 10]
 end
 
-def startTest(number, browser)
+#функция запуска теста
+def startTest(testName, browser)
 
   #проверяем указан ли браузер
   if browser == nil
@@ -25,7 +26,7 @@ def startTest(number, browser)
   end
 
   #вызываем нужный номер теста и нужный браузер
-  send("test#{number}".to_sym, browser)
+  send("#{testName}".to_sym, browser)
 
   #закрываем файл лога
   $stdout.flush
@@ -44,7 +45,7 @@ def options
 
     opts.on('-a', '--all-tests-in-one-browser', 'all tests in one browser') { |a| @options[:aio] = a }
     opts.on('-l', '--lan', 'use local code') { |l| @options[:lan] = l }
-    opts.on('-n', '--number N', 'test number') { |n| @options[:number] = n }
+    opts.on('-n', '--name NAME', 'test name') { |n| @options[:name] = n }
   end.parse!
 
   if @options[:lan] == true

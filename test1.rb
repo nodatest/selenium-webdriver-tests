@@ -5,7 +5,7 @@ require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Проверки на noindex
-def test1(browser)
+def formycarnoindexexistence(browser)
 
   #задаём адрес ссылки
   link = "http://4mycar.ru#{@lan.to_s}/parts/Febi/01089"
