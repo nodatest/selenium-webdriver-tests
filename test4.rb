@@ -1,12 +1,11 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'selenium-webdriver'
 require_relative 'common.functions'
 require_relative 'test3'
 
 #Проверка 4mycar на отсутствие noindex
-def formycarnoindexmiss(sites = @sites, pages = @pages, browser)
+def formycar_noindex_miss(sites = @sites, pages = @pages)
   for index2 in 0 ... pages.size
     link = "http://#{sites[0]}#{@lan.to_s}/?#{pages[index2]}"
     #переходим по ссылке

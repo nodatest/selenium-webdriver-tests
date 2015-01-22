@@ -1,11 +1,10 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Проверки на noindex
-def formycarnoindexexistence(browser)
+def formycar_noindex_existence
 
   #задаём адрес ссылки
   link = "http://4mycar.ru#{@lan.to_s}/parts/Febi/01089"

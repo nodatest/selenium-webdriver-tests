@@ -1,11 +1,10 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require 'selenium-webdriver'
 require_relative 'common.functions'
 
 #Нет редиректа, доступны результаты
-def formycarnoredirectandavailableresults(browser)
+def formycar_no_redirect_and_available_results
 
   #задаём адрес ссылки
   link = "http://4mycar.ru#{@lan.to_s}/parts/Liqui%20moly/3970"
