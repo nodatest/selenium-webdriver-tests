@@ -7,9 +7,11 @@ require_relative 'common.functions'
 def formycar_noindex_existence
 
   #задаём адрес ссылки
+  puts 'задаём адрес ссылки'
   link = "http://4mycar.ru#{@lan.to_s}/parts/Febi/01089"
 
   #переходим по ссылке
+  puts 'переходим по ссылке'
   @driver.navigate.to link
 
   #проверяем наличие noindex в комментариях
@@ -19,6 +21,7 @@ def formycar_noindex_existence
 =end
 
   #проверяем отсутствие noindex в результатах
+  puts 'проверяем отсутствие noindex в результатах'
   begin
     result = @driver.find_elements(:xpath, "//div[@id='searchResultsDiv']//noindex").nil?
   rescue
@@ -29,6 +32,9 @@ def formycar_noindex_existence
   else
     puts "#{time} test1: Ошибка! noindex в результатах есть!"
   end
+
+  #закрываем файл лога
+  $stdout.flush
 end
 
 

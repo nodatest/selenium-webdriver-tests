@@ -21,6 +21,7 @@ def options
     opts.on('-a', '--all-tests-in-one-browser', 'all tests in one browser') { |a| @options[:aio] = a }
     opts.on('-l', '--lan', 'use local code') { |l| @options[:lan] = l }
     opts.on('-n', '--name NAME', 'test name') { |n| @options[:name] = n }
+    opts.on('-f', '--fullscreen', 'fullscreen mode') { |m| @options[:fullscreen] = m }
   end.parse!
 
   if @options[:lan] == true
@@ -46,6 +47,11 @@ def seleniumdriver(browser)
   @client = Selenium::WebDriver::Remote::Http::Default.new
   @client.timeout = 120 # seconds
   @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
+  #если установлен параметр запуска бразуере в полнооконном режиме
+  if @options[:fullscreen].nil? == false
+    #делаем окно браузера на весь экран
+    @driver.manage.window.maximize
+  end
 end
 
 #функция проверки условия, при котором происходит выход из браузера
@@ -54,58 +60,5 @@ def brwoserquit
   if @options[:aio].nil? == true
     #выходим из браузера
     @driver.quit
-  end
-end
-
-#функция с основной логикой работы
-def logic(tests)
-
-  #обрабатываем параметры командной строки
-  options
-
-  #задаём массив браузеров
-  browsers = %w(chrome firefox)
-
-  #если задано имя функции теста
-  if @options[:name].nil? == false
-    #лог выполнения тестов
-    $stdout = File.open("../selenium-webdriver-logs/chrome_#{date}.txt", 'a')
-    #запускаем браузер
-    seleniumdriver(browsers[0])
-    #выполняем тест
-    send("#{@options[:name]}".to_sym)
-    #выходим из браузера
-    @driver.quit
-  else
-    loop {
-      for i in 0 ... browsers.size
-
-        #если установлен параметр запуска тестов в одном бразуере
-        if @options[:aio] == true
-          #запускаем браузер
-          seleniumdriver(browsers[i])
-        end
-
-        for y in 0 ... tests.size
-          #запускаем браузер и включаем логирование
-          initializebrowserandlog(browsers[i])
-          #выполняем тест
-          send("#{tests[y]}")
-          #закрываем файл лога
-          $stdout.flush
-          #выходим из браузера
-          brwoserquit
-        end
-
-        #если установлен параметр запуска тестов в одном бразуере
-        if @options[:aio] == true
-          #выходим из браузера
-          @driver.quit
-        end
-      end
-
-      #ждём 1 час
-      sleep 3600
-    }
   end
 end

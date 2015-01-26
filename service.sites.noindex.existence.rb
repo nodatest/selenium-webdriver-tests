@@ -14,16 +14,22 @@ def service_sites_noindex_existence(sites = @sites, pages = @pages)
     for index2 in 0 ... pages.size
       link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"
       #переходим по ссылке
+      puts 'переходим по ссылке'
       @driver.navigate.to link
       #удаляем все куки
+      puts 'удаляем все куки'
       @driver.manage.delete_all_cookies
       #проверяем наличие noindex, nofollow на странице
+      puts 'проверяем наличие noindex, nofollow на странице'
       result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
       if (result == 1) then
         puts "#{time} test3: noindex [tecdoc] присутствует. ссылка: #{link}"
       else
         puts "#{time} test3: Ошибка! noindex [tecdoc] отсутствует. ссылка: #{link}"
       end
+
+      #закрываем файл лога
+      $stdout.flush
     end
   end
 end
