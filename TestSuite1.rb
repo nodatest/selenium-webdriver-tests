@@ -22,8 +22,9 @@ if @options[:name].nil? == false
     @client.timeout = 120 # seconds
     @driver = Selenium::WebDriver.for(:"#{browsers[0]}", :http_client => @client)
   end
+
   #выполняем тест
-  send("#{@options[:name]}".to_sym, "#{browsers[0]}")
+  send("#{@options[:name]}".to_sym, browsers[0])
   #если установлен параметр запуска тестов в одном бразуере
   if @options[:aio].nil? == false
     #выходим из браузера

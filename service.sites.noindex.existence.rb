@@ -11,41 +11,29 @@ require_relative 'common.functions'
 #Проверка сервисных cайтов на наличие noindex [tecdoc]
 def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
 
-  #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
-    #запускаем браузер
-    @client = Selenium::WebDriver::Remote::Http::Default.new
-    @client.timeout = 120 # seconds
-    @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
-  end
+  #проверяем часть переданных параметров командной строки и включаем логирование
+  checkparametersandlog(browser)
 
-  #если установлен параметр запуска бразуере в полнооконном режиме
-  if @options[:fullscreen].nil? == false
-    #делаем окно браузера на весь экран
-    @driver.manage.window.maximize
-  end
-
-  #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
+  puts '===== Проверка наличия noindex, nofollow на страницах сервисных сайтов ====='
 
   for index1 in 1 ... sites.size
     for index2 in 0 ... pages.size
       #задаём адрес ссылки
-      puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: задаём адрес ссылки"
+      puts "#{time} задаём адрес ссылки"
       link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"
       #переходим по ссылке
-      puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: переходим по ссылке #{link}"
+      puts "#{time} переходим по ссылке #{link}"
       @driver.navigate.to link
       #удаляем все куки
-      puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: удаляем все куки"
+      puts "#{time} удаляем все куки"
       @driver.manage.delete_all_cookies
       #проверяем наличие noindex, nofollow на странице
-      puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: проверяем наличие noindex, nofollow на странице"
+      puts "#{time} проверяем наличие noindex, nofollow на странице"
       result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
       if (result == 1) then
-        puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: noindex [tecdoc] присутствует"
+        puts "#{time} noindex [tecdoc] присутствует"
       else
-        puts "#{time} Проверка наличия noindex, nofollow на страницах сервисных сайтов: Ошибка! noindex [tecdoc] отсутствует!"
+        puts "#{time} Ошибка! noindex [tecdoc] отсутствует!"
       end
 
       #закрываем файл лога
