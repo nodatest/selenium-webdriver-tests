@@ -1,5 +1,4 @@
 require 'selenium-webdriver'
-
 require_relative '4mycar.no.redirect.and.available.results'
 require_relative '4mycar.noindex.existence'
 require_relative '4mycar.noindex.miss'
@@ -16,14 +15,20 @@ options
 browsers = %w(chrome firefox)
 #если задано имя функции теста
 if @options[:name].nil? == false
-  #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/chrome_#{date}.txt", 'a')
-  #запускаем браузер
-  seleniumdriver(browsers[0])
+  #если установлен параметр запуска тестов в одном бразуере
+  if @options[:aio].nil? == false
+    #запускаем браузер
+    @client = Selenium::WebDriver::Remote::Http::Default.new
+    @client.timeout = 120 # seconds
+    @driver = Selenium::WebDriver.for(:"#{browsers[0]}", :http_client => @client)
+  end
   #выполняем тест
-  send("#{@options[:name]}".to_sym)
-  #выходим из браузера
-  @driver.quit
+  send("#{@options[:name]}".to_sym, "#{browsers[0]}")
+  #если установлен параметр запуска тестов в одном бразуере
+  if @options[:aio].nil? == false
+    #выходим из браузера
+    @driver.quit
+  end
 else
   loop {
     for i in 0 ... browsers.size
@@ -31,31 +36,16 @@ else
       #если установлен параметр запуска тестов в одном бразуере
       if @options[:aio] == true
         #запускаем браузер
-        seleniumdriver(browsers[i])
+        @client = Selenium::WebDriver::Remote::Http::Default.new
+        @client.timeout = 120 # seconds
+        @driver = Selenium::WebDriver.for(:"#{browsers[i]}", :http_client => @client)
       end
 
       #выполняем тесты
-
-      #запускаем браузер и включаем логирование
-      initializebrowserandlog(browsers[i])
-      formycar_noindex_existence
-      #выходим из браузера
-      brwoserquit
-      #запускаем браузер и включаем логирование
-      initializebrowserandlog(browsers[i])
-      formycar_no_redirect_and_available_results
-      #выходим из браузера
-      brwoserquit
-      #запускаем браузер и включаем логирование
-      initializebrowserandlog(browsers[i])
-      service_sites_noindex_existence
-      #выходим из браузера
-      brwoserquit
-      #запускаем браузер и включаем логирование
-      initializebrowserandlog(browsers[i])
-      formycar_noindex_miss
-      #выходим из браузера
-      brwoserquit
+      formycar_noindex_existence(browsers[i])
+      formycar_no_redirect_and_available_results(browsers[i])
+      service_sites_noindex_existence(browsers[i])
+      formycar_noindex_miss(browsers[i])
 
       #если установлен параметр запуска тестов в одном бразуере
       if @options[:aio] == true
