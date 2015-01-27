@@ -30,22 +30,16 @@ def formycar_no_redirect_and_available_results(browser)
   #проверяем наличие на странице результатов
   puts "#{time} проверяем наличие на странице результатов"
   begin
-    result = @driver.find_element(:id, 'searchResultsDiv').nil?
+    result = !@driver.find_element(:id, 'searchResultsDiv')
   rescue
-  end
-
-  if (!result) then
-    puts "#{time} Результаты есть"
-  else
     puts "#{time} Ошибка! Результатов нет!"
   end
+
+  puts "#{time} Результаты есть" if !result
 
   #закрываем файл лога
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
-    #выходим из браузера
-    @driver.quit
-  end
+  @driver.quit if !@options[:aio]
 end

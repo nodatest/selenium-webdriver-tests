@@ -14,9 +14,9 @@ options
 #задаём массив браузеров
 browsers = %w(chrome firefox)
 #если задано имя функции теста
-if @options[:name].nil? == false
+if @options[:name]
   #если установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == false
+  if @options[:aio]
     #запускаем браузер
     @client = Selenium::WebDriver::Remote::Http::Default.new
     @client.timeout = 120 # seconds
@@ -26,16 +26,13 @@ if @options[:name].nil? == false
   #выполняем тест
   send("#{@options[:name]}".to_sym, browsers[0])
   #если установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == false
-    #выходим из браузера
-    @driver.quit
-  end
+  @driver.quit if @options[:aio]
 else
   loop {
     for i in 0 ... browsers.size
 
       #если установлен параметр запуска тестов в одном бразуере
-      if @options[:aio] == true
+      if @options[:aio]
         #запускаем браузер
         @client = Selenium::WebDriver::Remote::Http::Default.new
         @client.timeout = 120 # seconds
@@ -49,10 +46,7 @@ else
       formycar_noindex_miss(browsers[i])
 
       #если установлен параметр запуска тестов в одном бразуере
-      if @options[:aio] == true
-        #выходим из браузера
-        @driver.quit
-      end
+      @driver.quit if @options[:aio]
     end
 
     #ждём 1 час

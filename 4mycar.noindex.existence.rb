@@ -28,22 +28,18 @@ def formycar_noindex_existence(browser)
   #проверяем отсутствие noindex в результатах
   puts "#{time} проверяем отсутствие noindex в результатах"
   begin
-    result = @driver.find_elements(:xpath, "//div[@id='searchResultsDiv']//noindex").nil?
+    result = !@driver.find_elements(:xpath, "//div[@id='searchResultsDiv']//noindex")
   rescue
+    puts "#{time} Ошибка! noindex в результатах есть!"
   end
 
-  if !result then
+  if !result
     puts "#{time} noindex в результатах нет"
-  else
-    puts "#{time} Ошибка! noindex в результатах есть!"
   end
 
   #закрываем файл лога
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
-    #выходим из браузера
-    @driver.quit
-  end
+  @driver.quit if !@options[:aio]
 end

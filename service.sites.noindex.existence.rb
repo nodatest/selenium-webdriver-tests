@@ -29,21 +29,21 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
       @driver.manage.delete_all_cookies
       #проверяем наличие noindex, nofollow на странице
       puts "#{time} проверяем наличие noindex, nofollow на странице"
-      result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
-      if (result == 1) then
-        puts "#{time} noindex [tecdoc] присутствует"
-      else
+      begin
+        result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
+      rescue
         puts "#{time} Ошибка! noindex [tecdoc] отсутствует!"
       end
-
+      if result == 1
+        puts "#{time} 1 noindex [tecdoc] присутствует"
+      else
+        puts "#{time} Ошибка! noindex [tecdoc] больше, чем 1!"
+      end
       #закрываем файл лога
       $stdout.flush
     end
   end
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
-    #выходим из браузера
-    @driver.quit
-  end
+  @driver.quit if !@options[:aio]
 end

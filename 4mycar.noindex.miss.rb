@@ -23,11 +23,13 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
     puts "#{time} удаляем все куки"
     @driver.manage.delete_all_cookies
     #проверяем отсутствие noindex, nofollow на странице
-    puts "#{time} проверяем наличие noindex, nofollow на странице"
+    puts "#{time} проверяем отсутствие noindex, nofollow на странице"
+    begin
     result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
-    if result == 0 then
+    rescue
       puts "#{time} noindex [4mycar] отсутствует"
-    else
+    end
+    if result > 0
       puts "#{time} Ошибка! noindex [4mycar] присутствует!"
     end
 
@@ -36,8 +38,5 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
   end
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
-    #выходим из браузера
-    @driver.quit
-  end
+  @driver.quit if !@options[:aio]
 end

@@ -24,16 +24,14 @@ def options
     opts.on('-f', '--fullscreen', 'fullscreen mode') { |m| @options[:fullscreen] = m }
   end.parse!
 
-  if @options[:lan] == true
-    @lan = '.lan'
-  end
+  @lan = '.lan' if @options[:lan]
 end
 
 #функция проверки параметров запуска тестов в одном бразуере и запуска бразуера в полнооконном режиме
 # + включения логирования в файл
 def checkparametersandlog(browser)
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if @options[:aio].nil? == true
+  if !@options[:aio]
     #запускаем браузер
     @client = Selenium::WebDriver::Remote::Http::Default.new
     @client.timeout = 120 # seconds
@@ -41,10 +39,7 @@ def checkparametersandlog(browser)
   end
 
   #если установлен параметр запуска бразуера в полнооконном режиме
-  if @options[:fullscreen].nil? == false
-    #делаем окно браузера на весь экран
-    @driver.manage.window.maximize
-  end
+  @driver.manage.window.maximize if @options[:fullscreen]
 
   #лог выполнения тестов
   $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
