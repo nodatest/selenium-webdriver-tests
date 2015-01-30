@@ -11,28 +11,36 @@ $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
 #обрабатываем параметры командной строки
 options
 
-#задаём массив браузеров
-browsers = %w(chrome firefox)
-
 #если задано имя функции теста
 if @options[:name]
   #игнорируем параметр запуска тестов в одном бразуере
   @options[:aio] = false
 
+  #по-умолчанию тесты выполняются в двух хроме, если параметр -b не передан
+  @browser = 'chrome' if !@options[:browser]
+
+  #задаём массив браузеров в зависимости от переданного параметра -b
+  case @options[:browser]
+    when 'firefox'
+      @browser = 'firefox'
+    else
+      @browser = 'chrome'
+  end
+
   #выполняем тест
-  send("#{@options[:name]}".to_sym, browsers[0])
+  send("#{@options[:name]}".to_sym, @browser)
 else
   loop {
-    for i in 0 ... browsers.size
+    for i in 0 ... @browser.size
 
       #если установлен параметр запуска тестов в одном бразуере
-      startBrowser(browsers[i]) if @options[:aio]
+      startBrowser(@browser[i]) if @options[:aio]
 
       #выполняем тесты
-      formycar_noindex_existence(browsers[i])
-      formycar_no_redirect_and_available_results(browsers[i])
-      service_sites_noindex_existence(browsers[i])
-      formycar_noindex_miss(browsers[i])
+      formycar_noindex_existence(@browser[i])
+      formycar_no_redirect_and_available_results(@browser[i])
+      service_sites_noindex_existence(@browser[i])
+      formycar_noindex_miss(@browser[i])
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]

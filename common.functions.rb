@@ -17,14 +17,27 @@ def options
   @options = {}
   OptionParser.new do |opts|
     opts.banner = 'Usage: example.rb [options]'
-
     opts.on('-a', '--all-tests-in-one-browser', 'all tests in one browser') { |a| @options[:aio] = a }
+    opts.on('-b', '--browser NAME', 'set browser (chrome/firefox)') { |b| @options[:browser] = b }
+    opts.on('-f', '--fullscreen', 'fullscreen mode') { |f| @options[:fullscreen] = f }
     opts.on('-l', '--lan', 'use local code') { |l| @options[:lan] = l }
     opts.on('-n', '--name NAME', 'test name') { |n| @options[:name] = n }
-    opts.on('-f', '--fullscreen', 'fullscreen mode') { |m| @options[:fullscreen] = m }
   end.parse!
 
   @lan = '.lan' if @options[:lan]
+
+  #по-умолчанию тесты выполняются в двух браузерах, если параметр -b не передан
+  @browser = %w(chrome firefox) if !@options[:browser]
+
+  #задаём массив браузеров в зависимости от переданного параметра -b
+  case @options[:browser]
+    when 'chrome'
+      @browser = %w(chrome)
+    when 'firefox'
+      @browser = %w(firefox)
+    else
+      @browser = %w(chrome firefox)
+  end
 end
 
 #функция проверки параметров запуска тестов в одном бразуере и запуска бразуера в полнооконном режиме
