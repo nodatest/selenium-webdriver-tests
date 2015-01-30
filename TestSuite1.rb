@@ -13,31 +13,20 @@ options
 
 #задаём массив браузеров
 browsers = %w(chrome firefox)
+
 #если задано имя функции теста
 if @options[:name]
-  #если установлен параметр запуска тестов в одном бразуере
-  if @options[:aio]
-    #запускаем браузер
-    @client = Selenium::WebDriver::Remote::Http::Default.new
-    @client.timeout = 120 # seconds
-    @driver = Selenium::WebDriver.for(:"#{browsers[0]}", :http_client => @client)
-  end
+  #игнорируем параметр запуска тестов в одном бразуере
+  @options[:aio] = false
 
   #выполняем тест
   send("#{@options[:name]}".to_sym, browsers[0])
-  #если установлен параметр запуска тестов в одном бразуере
-  @driver.quit if @options[:aio]
 else
   loop {
     for i in 0 ... browsers.size
 
       #если установлен параметр запуска тестов в одном бразуере
-      if @options[:aio]
-        #запускаем браузер
-        @client = Selenium::WebDriver::Remote::Http::Default.new
-        @client.timeout = 120 # seconds
-        @driver = Selenium::WebDriver.for(:"#{browsers[i]}", :http_client => @client)
-      end
+      startBrowser(browsers[i]) if @options[:aio]
 
       #выполняем тесты
       formycar_noindex_existence(browsers[i])

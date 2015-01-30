@@ -31,16 +31,18 @@ end
 # + включения логирования в файл
 def checkparametersandlog(browser)
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  if !@options[:aio]
-    #запускаем браузер
-    @client = Selenium::WebDriver::Remote::Http::Default.new
-    @client.timeout = 120 # seconds
-    @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
-  end
+  startBrowser(browser) if !@options[:aio]
 
   #если установлен параметр запуска бразуера в полнооконном режиме
   @driver.manage.window.maximize if @options[:fullscreen]
 
   #лог выполнения тестов
   $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
+end
+
+#функция запуска браузера
+def startBrowser(browser)
+  @client = Selenium::WebDriver::Remote::Http::Default.new
+  @client.timeout = 120 # seconds
+  @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
 end
