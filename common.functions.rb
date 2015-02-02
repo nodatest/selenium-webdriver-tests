@@ -26,9 +26,6 @@ def options
 
   @lan = '.lan' if @options[:lan]
 
-  #по-умолчанию тесты выполняются в двух браузерах, если параметр -b не передан
-  @browser = %w(chrome firefox) if !@options[:browser]
-
   #задаём массив браузеров в зависимости от переданного параметра -b
   case @options[:browser]
     when 'chrome'
@@ -36,7 +33,11 @@ def options
     when 'firefox'
       @browser = %w(firefox)
     else
-      @browser = %w(chrome firefox)
+      if @options[:name]
+        @browser = %w(chrome)
+      else
+        @browser = %w(chrome firefox)
+      end
   end
 end
 
@@ -55,6 +56,7 @@ end
 
 #функция запуска браузера
 def startBrowser(browser)
+  puts browser
   @client = Selenium::WebDriver::Remote::Http::Default.new
   @client.timeout = 120 # seconds
   @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)

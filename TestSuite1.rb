@@ -16,19 +16,8 @@ if @options[:name]
   #игнорируем параметр запуска тестов в одном бразуере
   @options[:aio] = false
 
-  #по-умолчанию тесты выполняются в двух хроме, если параметр -b не передан
-  @browser = 'chrome' if !@options[:browser]
-
-  #задаём массив браузеров в зависимости от переданного параметра -b
-  case @options[:browser]
-    when 'firefox'
-      @browser = 'firefox'
-    else
-      @browser = 'chrome'
-  end
-
   #выполняем тест
-  send("#{@options[:name]}".to_sym, @browser)
+  send("#{@options[:name]}".to_sym, @browser[0])
 else
   loop {
     for i in 0 ... @browser.size
