@@ -28,16 +28,12 @@ def options
 
   #задаём массив браузеров в зависимости от переданного параметра -b
   case @options[:browser]
-    when 'chrome'
-      @browser = %w(chrome)
     when 'firefox'
       @browser = %w(firefox)
+    when 'chrome'
+      @browser = %w(chrome)
     else
-      if @options[:name]
-        @browser = %w(chrome)
-      else
-        @browser = %w(chrome firefox)
-      end
+      @browser = %w(chrome firefox)
   end
 end
 
@@ -56,7 +52,6 @@ end
 
 #функция запуска браузера
 def startBrowser(browser)
-  puts browser
   @client = Selenium::WebDriver::Remote::Http::Default.new
   @client.timeout = 120 # seconds
   @driver = Selenium::WebDriver.for(:"#{browser}", :http_client => @client)
