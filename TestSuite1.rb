@@ -1,9 +1,12 @@
 require 'selenium-webdriver'
+require_relative 'common.functions'
 require_relative '4mycar.no.redirect.and.available.results'
 require_relative '4mycar.noindex.existence'
 require_relative '4mycar.noindex.miss'
 require_relative 'service.sites.noindex.existence'
-require_relative 'common.functions'
+require_relative 'create.franchisee'
+require_relative 'gk.order'
+require_relative 'franchisee.order'
 
 #выводим ошибки ruby в файл
 $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
@@ -14,10 +17,16 @@ options
 #если задано имя функции теста
 if @options[:name]
   #игнорируем параметр запуска тестов в одном бразуере
-  @options[:aio] = false
+  #@options[:aio] = false
+
+  #если установлен параметр запуска тестов в одном бразуере
+  startBrowser(@browser[0]) if @options[:aio]
 
   #выполняем тест
   send("#{@options[:name]}".to_sym, @browser[0])
+
+  #если установлен параметр запуска тестов в одном бразуере
+  @driver.quit if @options[:aio]
 else
   loop {
     for i in 0 ... @browser.size
@@ -30,6 +39,10 @@ else
       formycar_no_redirect_and_available_results(@browser[i])
       service_sites_noindex_existence(@browser[i])
       formycar_noindex_miss(@browser[i])
+
+      createFranchisee(@browser[i])
+      gkOrder(@browser[i])
+      franchiseeOrder(@browser[i])
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]
