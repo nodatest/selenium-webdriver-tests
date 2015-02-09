@@ -36,4 +36,3 @@ def gkOrder(browser)
   #если НЕ установлен параметр запуска тестов в одном бразуере
   @driver.quit if !@options[:aio]
 end
-
