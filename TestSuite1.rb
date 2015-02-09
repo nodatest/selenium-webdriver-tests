@@ -7,6 +7,7 @@ require_relative 'service.sites.noindex.existence'
 require_relative 'create.franchisee'
 require_relative 'gk.order'
 require_relative 'franchisee.order'
+require_relative 'place.order.from.franch.to.gk'
 
 #выводим ошибки ruby в файл
 $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
@@ -43,6 +44,7 @@ else
       createFranchisee(@browser[i])
       gkOrder(@browser[i])
       franchiseeOrder(@browser[i])
+      placeOrderFromFranchToGk(@browser[i])
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]

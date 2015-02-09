@@ -22,8 +22,24 @@ def franchiseeOrder(browser)
   #авторизируемся в ПУ франчайзи
   cpLogin
 
-  #создаём клиента, ищем товар, добавляем его в корзину и оформляем заказ
-  createClientAndSearchAndSendOrder
+  #создание клиента
+  createClient(0)
+
+  link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+  link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
+  @driver.navigate.to link #переходим на сайт под клиентом
+
+  #поиск
+  search('oc90')
+
+  #добавляем товар в корзину
+  addToCart
+
+  #кликаем по кнопке "Оформить заказ"
+  @driver.find_element(:xpath, '//*[@id="formTrash"]/div[2]/div[2]/input').click
+
+  #отправляем заказ
+  sendOrder
 
   #закрываем файл лога
   $stdout.flush
