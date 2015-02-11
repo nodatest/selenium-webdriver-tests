@@ -5,29 +5,30 @@ require_relative 'create.franchisee'
 
 def franchiseeOrder(browser)
 
-  #создаём франчайзи, если перед этим он не был создан
-  createFranchisee(browser) if @options[:name] or @login.nil?
+  #если перед этим франчайзи не был создан
+  if @franchid.nil?
+    #создаём франчайзи
+    createFranchisee(browser)
+  end
 
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
   puts '===== Добавление заказа на созданном франчайзи ====='
 
-  #логинимся в рут
-  cpLoginFromRoot
+  if @link.nil? or @options[:name].nil?
+    #логинимся в рут
+    cpLoginFromRoot
+    #устанавливаем значение опции
+    setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1)
+    #авторизируемся в ПУ франчайзи
+    cpLogin
+    createClient(0) #создание клиента
+    @link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+    @link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
+  end
 
-  #устанавливаем значение опции
-  setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1)
-
-  #авторизируемся в ПУ франчайзи
-  cpLogin
-
-  #создание клиента
-  createClient(0)
-
-  link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
-  link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
-  @driver.navigate.to link #переходим на сайт под клиентом
+  @driver.navigate.to @link #переходим на сайт под клиентом
 
   #поиск
   search('oc90')

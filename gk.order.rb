@@ -8,15 +8,20 @@ def gkOrder(browser)
 
   puts '===== Добавление заказа на сайте ГК ====='
 
-  #получение ссылки в руте для перехода в пу
-  cpLoginFromRoot
+  if @orderid.nil?
+    #получение ссылки в руте для перехода в пу
+    cpLoginFromRoot
 
-  #создание клиента
-  createClient(0)
+    #создание клиента
+    createClient(0)
 
-  link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
-  link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
-  @driver.navigate.to link #переходим на сайт под клиентом
+    @link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+    @link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
+  end
+
+  puts @link
+
+  @driver.navigate.to @link #переходим на сайт под клиентом
 
   #поиск
   search('oc90')

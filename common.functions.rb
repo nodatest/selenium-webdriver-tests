@@ -68,8 +68,8 @@ end
 def cpLoginFromRoot
   @driver.navigate.to 'http://root.abcp.ru/' #переходим в рут
   begin
-    @driver.find_element(:css, '.inp').send_keys('') #вводим логин
-    @driver.find_element(:name, 'pass').send_keys('') #вводим пароль
+    @driver.find_element(:css, '.inp').send_keys('autotest') #вводим логин
+    @driver.find_element(:name, 'pass').send_keys('123123') #вводим пароль
     @driver.find_element(:name, 'go').click #кликаем на вкладку вход
   rescue
   end

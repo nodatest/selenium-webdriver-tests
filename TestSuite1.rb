@@ -18,7 +18,7 @@ options
 #если задано имя функции теста
 if @options[:name]
   #игнорируем параметр запуска тестов в одном бразуере
-  #@options[:aio] = false
+  @options[:aio] = false
 
   #если установлен параметр запуска тестов в одном бразуере
   startBrowser(@browser[0]) if @options[:aio]
