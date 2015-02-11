@@ -4,9 +4,7 @@ require_relative 'common.functions'
 require_relative 'franchisee.order'
 
 def placeOrderFromFranchToGk(browser)
-  if @orderid.nil? #делаем заказ под франчем, если он не был сделан
-    franchiseeOrder(browser)
-  end
+  franchiseeOrder(browser) if @orderid.nil? #делаем заказ под франчем, если он не был сделан
 
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)

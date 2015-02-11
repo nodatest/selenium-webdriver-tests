@@ -5,11 +5,8 @@ require_relative 'create.franchisee'
 
 def franchiseeOrder(browser)
 
-  #если перед этим франчайзи не был создан
-  if @franchid.nil?
-    #создаём франчайзи
-    createFranchisee(browser)
-  end
+  #создаём франчайзи, если перед этим он не был создан
+  createFranchisee(browser) if @franchid.nil?
 
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
