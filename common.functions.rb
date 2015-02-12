@@ -74,7 +74,7 @@ def cpLoginFromRoot
   rescue
   end
   @driver.navigate.to 'http://root.abcp.ru/?search=selen&page=customers' #переходим по ссылке, которая отфильтровывает нашего тестового реселлера
-  link = @driver.find_element(:xpath, '//*[@id="content"]/table/tbody/tr/td/table/tbody/tr[2]/td[2]/div/a[1]').attribute('href') #получаем адрес ссылки для перехода в пу
+  link = @driver.find_element(:xpath, '//*[@class="q-login-menu"]/a[1]').attribute('href') #получаем адрес ссылки для перехода в пу
   link['http://cp.abcp.ru'] = "http://cp.abcp.ru#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
   @driver.navigate.to link #переходим в пу под сотрудником нодасофт
 end
@@ -86,23 +86,23 @@ def createClient(profileid)
   @driver.find_element(:name, 'customerName').send_keys("user_#{time}") #вводим имя клиента
   @email = "user_#{rand(1..1000000).to_s}@selenium.noda.pro" #генерируем мыло
   @driver.find_element(:name, 'customerEmail').send_keys(@email) #вводим мыло
-  @driver.find_element(:xpath, "//*[@id='addCustomerDialog']/table/tbody/tr[6]/td/select/option[@value='#{profileid}']").click
+  @driver.find_element(:xpath, "//*[@name='customerProfiles']/*[@value='#{profileid}']").click #выбираем профиль клиента
   @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
-  @clientid = @driver.find_element(:xpath, '//*[@id="commonSettings"]/div/table/tbody/tr[1]/td').text.to_s #сохраняем clientid
+  @clientid = @driver.find_element(:xpath, '//*[@name="customerCode"]').attribute('value') #сохраняем clientid
 end
 
 #добавление франчайзи
-def addFranchisee
+def addFranchisee(clientid=@clientid, email=@email)
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
   @driver.find_element(:link, 'Добавить франчайзи').click #кликаем по ссылке "Добавить франчайзи"
   @driver.find_element(:name, 'agreeWithCreation').click #отмечаем чекбокс
-  for i in 0 .. @clientid.size
-    @driver.find_element(:id, 'clientAliveSearch').send_keys(@clientid[i]) #вводим id клиента
+  for i in 0 .. clientid.size
+    @driver.find_element(:id, 'clientAliveSearch').send_keys(clientid[i]) #вводим id клиента
     sleep 1 #пауза в сек
   end
   sleep 3
-  @driver.find_element(:xpath, '//*/tbody/tr[1]/td/div/div/table/tbody/tr/td[1]').click #кликаем по первому элементу выпадающего списка
-  @driver.find_element(:name, 'email').send_keys("franch_#{@email}") #вводим email
+  @driver.find_element(:xpath, "//*[@data-id='#{clientid}']").click #кликаем по первому элементу выпадающего списка
+  @driver.find_element(:name, 'email').send_keys("franch_#{email}") #вводим email
   begin
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
     parsed = JSON.parse(json) #парсим json-ответ
@@ -117,22 +117,26 @@ def addFranchisee
   @login = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
   @pass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
-  @franchid = @driver.find_element(:xpath, "//*[@id='tsortable']/tbody/tr[*]/td[contains(.,'#{city}')]/../td[5]").text #сохраняем id франчайзи
+  @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{city}')]/../td[5]").text #сохраняем id франчайзи
 end
 
 #функция поиска
-def search(number)
+def search(brand, number)
   @driver.find_element(:id, 'pcode').send_keys(number) #вводим поисковый запрос
-  @driver.find_element(:xpath, '/html/body/div[5]/table/tbody/tr[1]/td[2]/a').click #кликаем по первому элементу выпадающего списка
+  @driver.find_element(:xpath, '//*[@alt="Найти"]').click #жмём кнопку "Найти"
+  begin
+    @driver.find_element(:xpath, "//*[@href='/?pbrandnumber=#{number}&pbrandname=#{brand}']").click if @driver.find_element(:xpath, '//*[@class="startSearching"]').displayed?
+  rescue
+  end
 end
 
 #функция добавления товара в корзину
 def addToCart
-  @driver.find_element(:xpath, '//*[@id="searchResultsTable"]/tbody/tr[3]/td[9]/div/div[2]/button').click #жмём кнопку добавить в корзину
+  @driver.find_element(:xpath, '//*[@title="Купить"]').click #жмём кнопку добавить в корзину
   sleep 1 #сек
   #проверяем не появляется ли модальное окно
   begin
-    @driver.find_element(:xpath, '/html/body/div[6]/div[3]/div/button[1]/span').click if @driver.find_element(:xpath, '/html/body/div[6]').displayed?
+    @driver.find_element(:xpath, '//*[class="ui-button-text"]').click if @driver.find_element(:xpath, '//*[@id="dialogConfirm"]').displayed?
   rescue
   end
 end
@@ -143,19 +147,19 @@ def sendOrder
     @driver.find_element(:name, 'enableSendingSms').click #снимаем чекбокс отправки смс
   rescue
   end
-  @driver.find_element(:xpath, '//*[@id="trashAcceptorderForm"]/table/tbody/tr[2]/td/div[*]/div/input[2]').click #кликаем по кнопке "Отправить заказ"
-  @orderid = @driver.find_element(:xpath, '/html/body/div[3]/div[3]/div/div/div[2]/div[*]/strong').text #сохраняем id заказа
+  @driver.find_element(:xpath, '//*[@value="Отправить заказ"]').click #кликаем по кнопке "Отправить заказ"
+  @orderid = @driver.find_element(:xpath, '//*/div[2]/div[*]/strong').text #сохраняем id заказа
 end
 
 #функция авторизации в ПУ
-def cpLogin
+def cpLogin(login=@login, pass=@pass)
   @driver.navigate.to "http://cp.abcp.ru#{@lan}" #переходим в пу
   begin
-  @driver.find_element(:link, 'Выйти').click #разлогиниваемся в ПУ
+    @driver.find_element(:link, 'Выйти').click #разлогиниваемся в ПУ
   rescue
   end
-  @driver.find_element(:id, 'login').send_keys("#{@login}") #вводим логин
-  @driver.find_element(:id, 'pass').send_keys("#{@pass}") #вводим пароль
+  @driver.find_element(:id, 'login').send_keys("#{login}") #вводим логин
+  @driver.find_element(:id, 'pass').send_keys("#{pass}") #вводим пароль
   @driver.find_element(:id, 'go').click #кликаем по кнопке
 end
 
@@ -169,7 +173,7 @@ def setOptionFromRoot(resellerid, option, value)
     @driver.find_element(:xpath, "//*[@id='optionField']/option[@value='#{option}']").click #выбираем опцию
     @driver.find_element(:xpath, "//*[@id='valueField']/select/option[@value='#{value}']").click #выбираем значение
   rescue #иначе опция уже добавлена реселлеру
-    @driver.find_element(:xpath, "//*[@id='content']/table/tbody/tr/td/form/table/tbody/tr[17]/td[4]/select[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение опции
+    @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение опции
   end
   @driver.find_element(:id, 'submit').click #сохраняем
 end

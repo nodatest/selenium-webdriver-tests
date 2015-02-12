@@ -17,9 +17,9 @@ def placeOrderFromFranchToGk(browser)
   @driver.find_element(:link, 'Заказы').click #переходим на вкладку "Заказы"
   @driver.find_element(:link, @orderid).click #кликаем по нашему заказу
   @driver.find_element(:xpath, '//*[@id="allPlacingOrder"]').click #кликаем по чекбоксу "Заказ", который отмечает все позиции в столбце
-  @driver.find_element(:xpath, '//*[@id="postable"]/tbody/tr[4]/td[3]/input').click #кликаем по кнопке "Отправить заказ поставщику"
+  @driver.find_element(:xpath, '//*[@value="Отправить заказ поставщику"]').click #кликаем по кнопке "Отправить заказ поставщику"
   sleep 3 #сек
-  @driver.find_element(:xpath, '/html/body/div[5]/div[11]/div/button[1]/span').click #кликаем по кнопке "Отправить"
+  @driver.find_element(:xpath, '//*[@class="ui-dialog-buttonset"]/button[1]/span').click #кликаем по кнопке "Отправить"
   reorderid = @driver.find_element(:xpath, '//*[@id="placeOrderDialogContent"]/form/h4[2]').text.split[1] #берём второе слово из строки, которое является номером заказа в ГК
 
   #логинимся в рут

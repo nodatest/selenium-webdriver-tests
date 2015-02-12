@@ -15,22 +15,20 @@ def gkOrder(browser)
     #создание клиента
     createClient(0)
 
-    @link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+    @link = @driver.find_element(:xpath, '//*[@class="linkTempLogin"]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
     @link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
   end
-
-  puts @link
 
   @driver.navigate.to @link #переходим на сайт под клиентом
 
   #поиск
-  search('oc90')
+  search('Febi', '01089')
 
   #добавляем товар в корзину
   addToCart
 
   #кликаем по кнопке "Оформить заказ"
-  @driver.find_element(:xpath, '//*[@id="formTrash"]/div[2]/div[2]/input').click
+  @driver.find_element(:xpath, '//*[@value="Оформить заказ"]').click
 
   #отправляем заказ
   sendOrder

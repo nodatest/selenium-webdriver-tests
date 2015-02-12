@@ -28,13 +28,13 @@ def franchiseeOrder(browser)
   @driver.navigate.to @link #переходим на сайт под клиентом
 
   #поиск
-  search('oc90')
+  search('Knecht', 'oc90')
 
   #добавляем товар в корзину
   addToCart
 
   #кликаем по кнопке "Оформить заказ"
-  @driver.find_element(:xpath, '//*[@id="formTrash"]/div[2]/div[2]/input').click
+  @driver.find_element(:xpath, '//*[@value="Оформить заказ"]').click
 
   #отправляем заказ
   sendOrder
