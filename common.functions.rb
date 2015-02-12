@@ -80,28 +80,25 @@ def cpLoginFromRoot
 end
 
 #создание клиента
-def createClient(profileid)
+def createClient(clientname, email, profileid)
   @driver.find_element(:link, 'Клиенты').click #кликаем по ссылке "клиенты"
   @driver.find_element(:link, 'Добавить клиента').click #кликаем по ссылке "добавить клиента"
-  @driver.find_element(:name, 'customerName').send_keys("user_#{time}") #вводим имя клиента
-  @email = "user_#{rand(1..1000000).to_s}@selenium.noda.pro" #генерируем мыло
-  @driver.find_element(:name, 'customerEmail').send_keys(@email) #вводим мыло
+  @driver.find_element(:name, 'customerName').send_keys(clientname) #вводим имя клиента
+  @driver.find_element(:name, 'customerEmail').send_keys(email) #вводим мыло
   @driver.find_element(:xpath, "//*[@name='customerProfiles']/*[@value='#{profileid}']").click #выбираем профиль клиента
   @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
   @clientid = @driver.find_element(:xpath, '//*[@name="customerCode"]').attribute('value') #сохраняем clientid
 end
 
 #добавление франчайзи
-def addFranchisee(clientid=@clientid, email=@email)
+def addFranchisee(clientname, email)
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
   @driver.find_element(:link, 'Добавить франчайзи').click #кликаем по ссылке "Добавить франчайзи"
   @driver.find_element(:name, 'agreeWithCreation').click #отмечаем чекбокс
-  for i in 0 .. clientid.size
-    @driver.find_element(:id, 'clientAliveSearch').send_keys(clientid[i]) #вводим id клиента
-    sleep 1 #пауза в сек
-  end
-  sleep 3
-  @driver.find_element(:xpath, "//*[@data-id='#{clientid}']").click #кликаем по первому элементу выпадающего списка
+  @driver.find_element(:id, 'clientAliveSearch').send_keys(clientname) #вводим id клиента
+  sleep 3 #сек
+  @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда id клиента не успевает попасть в список
+  @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим id из выпадающего списка
   @driver.find_element(:name, 'email').send_keys("franch_#{email}") #вводим email
   begin
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
@@ -109,11 +106,11 @@ def addFranchisee(clientid=@clientid, email=@email)
     begin
       city = parsed[rand(0..parsed.size)]['name']
     rescue
-      puts city
+      puts city #отладка
     end
   end until city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
   @driver.find_element(:name, 'city').send_keys(city) #вводим название города
-  @driver.find_element(:xpath, '//*/tr[11]/td/input').click #кликаем кнопку "Добавить"
+  @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
   @login = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
   @pass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"

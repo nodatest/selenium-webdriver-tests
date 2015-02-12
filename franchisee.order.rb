@@ -20,7 +20,12 @@ def franchiseeOrder(browser)
     setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1)
     #авторизируемся в ПУ франчайзи
     cpLogin
-    createClient(0) #создание клиента
+
+    clientname = "user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
+    email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
+
+    #создание клиента
+    createClient(clientname, email, 0)
     @link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
     @link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
   end

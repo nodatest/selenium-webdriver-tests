@@ -12,11 +12,14 @@ def createFranchisee(browser)
   #получение ссылки в руте для перехода в пу
   cpLoginFromRoot
 
+  clientname = "user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
+  email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
+
   #создание клиента
-  createClient(0)
+  createClient(clientname, email, 0)
 
   #добавление франчайзи
-  addFranchisee
+  addFranchisee(clientname, email,)
 
   #закрываем файл лога
   $stdout.flush
