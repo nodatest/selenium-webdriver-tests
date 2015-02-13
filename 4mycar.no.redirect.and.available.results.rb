@@ -37,7 +37,7 @@ def formycar_no_redirect_and_available_results(browser)
 
   puts "#{time} Результаты есть" if !result
 
-  #закрываем файл лога
+  #скидываем данные в лог
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере

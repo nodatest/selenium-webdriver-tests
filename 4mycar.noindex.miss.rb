@@ -33,7 +33,7 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
       puts "#{time} Ошибка! noindex [4mycar] присутствует!"
     end
 
-    #закрываем файл лога
+    #скидываем данные в лог
     $stdout.flush
   end
 

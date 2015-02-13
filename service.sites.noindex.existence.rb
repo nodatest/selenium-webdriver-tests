@@ -39,7 +39,7 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
       else
         puts "#{time} Ошибка! noindex [tecdoc] больше, чем 1!"
       end
-      #закрываем файл лога
+      #скидываем данные в лог
       $stdout.flush
     end
   end

@@ -37,7 +37,7 @@ def formycar_noindex_existence(browser)
     puts "#{time} noindex в результатах нет"
   end
 
-  #закрываем файл лога
+  #скидываем данные в лог
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере

@@ -21,7 +21,7 @@ def createFranchisee(browser)
   #добавление франчайзи
   addFranchisee(clientname, email,)
 
-  #закрываем файл лога
+  #скидываем данные в лог
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере

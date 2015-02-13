@@ -3,6 +3,27 @@
 require 'optparse'
 require 'json'
 require 'net/http'
+require 'logger'
+
+#класс для одновременного логирования в терминал и в файл
+class MultiDelegator
+  def initialize(*targets)
+    @targets = targets
+  end
+
+  def self.delegate(*methods)
+    methods.each do |m|
+      define_method(m) do |*args|
+        @targets.map { |t| t.send(m, *args) }
+      end
+    end
+    self
+  end
+
+  class <<self
+    alias to new
+  end
+end
 
 #время начала выполнения теста
 def time()
@@ -49,7 +70,8 @@ def checkparametersandlog(browser)
   @driver.manage.window.maximize if @options[:fullscreen]
 
   #лог выполнения тестов
-  $stdout = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
+  log_file = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
+  $stdout = MultiDelegator.delegate(:write, :close, :puts, :print, :flush).to(STDOUT, log_file)
 end
 
 #функция запуска браузера
