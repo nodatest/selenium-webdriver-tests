@@ -19,7 +19,7 @@ def franchiseeOrder(browser)
     #устанавливаем значение опции
     setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1)
     #авторизируемся в ПУ франчайзи
-    cpLogin
+    cpLogin(@cplogin, @cppass)
 
     clientname = "user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
     email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента

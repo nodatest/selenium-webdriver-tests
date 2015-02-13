@@ -87,7 +87,7 @@ def createClient(clientname, email, profileid)
   @driver.find_element(:name, 'customerEmail').send_keys(email) #вводим мыло
   @driver.find_element(:xpath, "//*[@name='customerProfiles']/*[@value='#{profileid}']").click #выбираем профиль клиента
   @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
-  @clientid = @driver.find_element(:xpath, '//*[@name="customerCode"]').attribute('value') #сохраняем clientid
+  @clientid = @driver.find_element(:xpath, '//*[contains(text(),"Системный код клиента:")]/../td') #сохраняем clientid
 end
 
 #добавление франчайзи
@@ -95,10 +95,10 @@ def addFranchisee(clientname, email)
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
   @driver.find_element(:link, 'Добавить франчайзи').click #кликаем по ссылке "Добавить франчайзи"
   @driver.find_element(:name, 'agreeWithCreation').click #отмечаем чекбокс
-  @driver.find_element(:id, 'clientAliveSearch').send_keys(clientname) #вводим id клиента
+  @driver.find_element(:id, 'clientAliveSearch').send_keys(clientname) #вводим имя клиента
   sleep 3 #сек
-  @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда id клиента не успевает попасть в список
-  @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим id из выпадающего списка
+  @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда имя клиента не успевает попасть в список
+  @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим именем из выпадающего списка
   @driver.find_element(:name, 'email').send_keys("franch_#{email}") #вводим email
   begin
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
@@ -111,8 +111,8 @@ def addFranchisee(clientname, email)
   end until city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
   @driver.find_element(:name, 'city').send_keys(city) #вводим название города
   @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
-  @login = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
-  @pass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
+  @cplogin = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
+  @cppass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
   @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{city}')]/../td[5]").text #сохраняем id франчайзи
 end
@@ -149,7 +149,7 @@ def sendOrder
 end
 
 #функция авторизации в ПУ
-def cpLogin(login=@login, pass=@pass)
+def cpLogin(login, pass)
   @driver.navigate.to "http://cp.abcp.ru#{@lan}" #переходим в пу
   begin
     @driver.find_element(:link, 'Выйти').click #разлогиниваемся в ПУ
