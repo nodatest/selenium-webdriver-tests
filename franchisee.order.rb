@@ -15,7 +15,7 @@ def franchiseeOrder(browser)
     #логинимся в рут
     cpLoginFromRoot
     #устанавливаем значение опции
-    setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1)
+    setOptionFromRoot(1, @franchid, 'cp/manually_add_customers', 1)
     #авторизируемся в ПУ франчайзи
     cpLogin(@cplogin, @cppass)
 

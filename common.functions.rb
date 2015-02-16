@@ -4,7 +4,7 @@ require 'json'
 require 'net/http'
 
 #получение ссылки в руте для перехода в пу
-def cpLoginFromRoot
+def cpLoginFromRoot(resellername='selenium.noda.pro')
   @driver.navigate.to 'http://root.abcp.ru/' #переходим в рут
   begin
     @driver.find_element(:css, '.inp').send_keys('autotest') #вводим логин
@@ -12,7 +12,7 @@ def cpLoginFromRoot
     @driver.find_element(:name, 'go').click #кликаем на вкладку вход
   rescue
   end
-  @driver.navigate.to 'http://root.abcp.ru/?search=selen&page=customers' #переходим по ссылке, которая отфильтровывает нашего тестового реселлера
+  @driver.navigate.to "http://root.abcp.ru/?search=#{resellername}&page=customers" #переходим по ссылке, которая отфильтровывает нашего тестового реселлера
   link = @driver.find_element(:xpath, '//*[@class="q-login-menu"]/a[1]').attribute('href') #получаем адрес ссылки для перехода в пу
   link['http://cp.abcp.ru'] = "http://cp.abcp.ru#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
   @driver.navigate.to link #переходим в пу под сотрудником нодасофт
@@ -43,17 +43,17 @@ def addFranchisee(clientname, email)
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
     parsed = JSON.parse(json) #парсим json-ответ
     begin
-      city = parsed[rand(0..parsed.size)]['name']
+      @city = parsed[rand(0..parsed.size)]['name']
     rescue
-      puts city #отладка
+      puts @city #отладка
     end
-  end until city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
-  @driver.find_element(:name, 'city').send_keys(city) #вводим название города
+  end until @city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
+  @driver.find_element(:name, 'city').send_keys(@city) #вводим название города
   @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
   @cplogin = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
   @cppass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
-  @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{city}')]/../td[5]").text #сохраняем id франчайзи
+  @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
 end
 
 #функция поиска
@@ -99,15 +99,18 @@ def cpLogin(login, pass)
   @driver.find_element(:id, 'go').click #кликаем по кнопке
 end
 
-#функция установки значения опции реселлера через рут
-def setOptionFromRoot(resellerid, option, value)
-  link = "http://root.abcp.ru/?page=reseller_edit_options&resellerId=#{resellerid}" #задаём ссылку
-  @driver.navigate.to link #переходим в рут для редактирования опций реселлера
-
-  #проверяем, что нет редиректа, т.е. действительно собираемся менять опцию у нужного нам реселлера
-  puts "#{time} проверяем, что нет редиректа"
-  if @driver.current_url == link then
-    puts "#{time} Редиректа нет"
+#функция установки значения опции реселлера/франча через рут
+def setOptionFromRoot(isfranch, resellerid, option, value)
+  if isfranch == 0
+    @driver.navigate.to "http://root.abcp.ru/?search=#{resellerid}&page=customers" #ищем в руте нашего реселлера по resellerid
+    @driver.find_element(:xpath, "//*/td[1]/span/a[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
+    @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера
+  else
+    @driver.navigate.to "http://root.abcp.ru/?page=reseller_edit_options&resellerId=#{resellerid}" #ищем в руте нашего реселлера по resellerid
+    resellername = @city.to_s.downcase #если франч, то присваиваем имени реселлера город франча в нижнем регистре
+  end
+  begin
+    @driver.find_element(:xpath, "//*[contains(text(),'Редактирование реселлера #{resellername}')]") #находим строчку, которая указывает на то, что мы редактируем нашего тестового реселлера
     sleep 1 #сек
     begin
       @driver.find_element(:xpath, "//*[@id='optionField']/option[@value='#{option}']").click #выбираем опцию
@@ -116,7 +119,7 @@ def setOptionFromRoot(resellerid, option, value)
       @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение опции
     end
     @driver.find_element(:id, 'submit').click #сохраняем
-  else
-    puts "#{time} Ошибка! Редирект есть!"
+  rescue
+    raise 'Редактирование опций чужого реселлера!'
   end
 end

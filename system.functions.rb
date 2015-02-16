@@ -2,6 +2,34 @@
 # encoding: utf-8
 require 'optparse'
 require 'logger'
+require 'unicode'
+
+#класс конвертации русских букв в различные регистры
+class String
+  def downcase
+    Unicode::downcase(self)
+  end
+
+  def downcase!
+    self.replace downcase
+  end
+
+  def upcase
+    Unicode::upcase(self)
+  end
+
+  def upcase!
+    self.replace upcase
+  end
+
+  def capitalize
+    Unicode::capitalize(self)
+  end
+
+  def capitalize!
+    self.replace capitalize
+  end
+end
 
 #класс для одновременного логирования в терминал и в файл
 class MultiDelegator
