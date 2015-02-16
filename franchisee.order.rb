@@ -1,7 +1,5 @@
 #!/bin/env ruby
 # encoding: utf-8
-require_relative 'common.functions'
-require_relative 'create.franchisee'
 
 def franchiseeOrder(browser)
 

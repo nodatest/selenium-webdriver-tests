@@ -1,7 +1,5 @@
 #!/bin/env ruby
 # encoding: utf-8
-require_relative 'common.functions'
-require_relative 'franchisee.order'
 
 def placeOrderFromFranchToGk(browser)
   franchiseeOrder(browser) if @orderid.nil? #делаем заказ под франчем, если он не был сделан

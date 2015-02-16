@@ -1,8 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require_relative 'common.functions'
-
 #задаём массив сайтов
 @sites = %w(4mycar.ru vmolchanov.abcp.ru training.noda.pro www.franch.abcp.ru www.mir.franch.abcp.ru)
 #задаём массив страниц

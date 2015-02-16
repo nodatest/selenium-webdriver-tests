@@ -1,6 +1,5 @@
 #!/bin/env ruby
 # encoding: utf-8
-require_relative 'common.functions'
 
 #функция создания франчайзи
 def createFranchisee(browser)
@@ -19,7 +18,7 @@ def createFranchisee(browser)
   createClient(clientname, email, 0)
 
   #добавление франчайзи
-  addFranchisee(clientname, email,)
+  addFranchisee(clientname, email)
 
   #скидываем данные в лог
   $stdout.flush

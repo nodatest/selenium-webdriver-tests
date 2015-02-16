@@ -1,8 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require_relative 'common.functions'
-
 #Нет редиректа, доступны результаты
 def formycar_no_redirect_and_available_results(browser)
 

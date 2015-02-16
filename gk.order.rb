@@ -1,6 +1,5 @@
 #!/bin/env ruby
 # encoding: utf-8
-require_relative 'common.functions'
 
 def gkOrder(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование

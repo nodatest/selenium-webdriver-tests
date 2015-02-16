@@ -1,8 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require_relative 'common.functions'
-
 #Проверки на noindex
 def formycar_noindex_existence(browser)
 

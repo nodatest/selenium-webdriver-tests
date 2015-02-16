@@ -1,9 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-require_relative 'common.functions'
-require_relative 'service.sites.noindex.existence'
-
 #Проверка 4mycar на отсутствие noindex
 def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
 

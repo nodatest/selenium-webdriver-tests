@@ -1,4 +1,5 @@
 require 'selenium-webdriver'
+require_relative 'system.functions'
 require_relative 'common.functions'
 require_relative '4mycar.no.redirect.and.available.results'
 require_relative '4mycar.noindex.existence'
