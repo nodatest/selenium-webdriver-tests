@@ -10,7 +10,7 @@ def placeOrderFromFranchToGk(browser)
   puts '===== Отправка заказа франча в ГК ====='
 
   #логинимся в ПУ под франчем
-  cpLogin(@cplogin, @cppass)
+  cpLogin(@cpfranchlogin, @cpfranchpass)
 
   @driver.find_element(:link, 'Заказы').click #переходим на вкладку "Заказы"
   @driver.find_element(:link, @orderid).click #кликаем по нашему заказу

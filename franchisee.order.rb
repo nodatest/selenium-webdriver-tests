@@ -1,7 +1,7 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-def franchiseeOrder(browser)
+def franchiseeOrder(browser, link)
 
   #создаём франчайзи, если перед этим он не был создан
   createFranchisee(browser) if @franchid.nil?
@@ -11,24 +11,24 @@ def franchiseeOrder(browser)
 
   puts '===== Добавление заказа на созданном франчайзи ====='
 
-  if @link.nil? or @options[:name].nil?
+  if link.nil? or @options[:name].nil?
     #логинимся в рут
     cpLoginFromRoot
     #устанавливаем значение опции
-    setOptionFromRoot(1, @franchid, 'cp/manually_add_customers', 1)
+    setOptionFromRoot(@franchid, 'cp/manually_add_customers', 1, 1)
     #авторизируемся в ПУ франчайзи
-    cpLogin(@cplogin, @cppass)
+    cpLogin(@cpfranchlogin, @cpfranchpass)
 
     clientname = "user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
     email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
 
     #создание клиента
     createClient(clientname, email, 0)
-    @link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
-    @link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
+    link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+    link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
   end
 
-  @driver.navigate.to @link #переходим на сайт под клиентом
+  @driver.navigate.to link #переходим на сайт под клиентом
 
   #поиск
   search('Knecht', 'oc90')

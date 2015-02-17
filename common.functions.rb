@@ -50,8 +50,8 @@ def addFranchisee(clientname, email)
   end until @city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
   @driver.find_element(:name, 'city').send_keys(@city) #вводим название города
   @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
-  @cplogin = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
-  @cppass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
+  @cpfranchlogin = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
+  @cpfranchpass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
   @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
   @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
 end
@@ -61,7 +61,7 @@ def search(brand, number)
   @driver.find_element(:id, 'pcode').send_keys(number) #вводим поисковый запрос
   @driver.find_element(:xpath, '//*[@alt="Найти"]').click #жмём кнопку "Найти"
   begin
-    @driver.find_element(:xpath, "//*[@href='/?pbrandnumber=#{number}&pbrandname=#{brand}']").click if @driver.find_element(:xpath, '//*[@class="startSearching"]').displayed?
+    @driver.find_element(:xpath, "//*[contains(text(),'#{brand}')]/../..//*[contains(text(),'#{number}')]/..//*[contains(text(),'Цены и аналоги')]").click if @driver.find_element(:xpath, '//*[contains(text(),"Цены и аналоги")]').displayed?
   rescue
   end
 end
@@ -100,14 +100,14 @@ def cpLogin(login, pass)
 end
 
 #функция установки значения опции реселлера/франча через рут
-def setOptionFromRoot(isfranch, resellerid, option, value)
-  if isfranch == 0
-    @driver.navigate.to "http://root.abcp.ru/?search=#{resellerid}&page=customers" #ищем в руте нашего реселлера по resellerid
-    @driver.find_element(:xpath, "//*/td[1]/span/a[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
-    @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера
-  else
+def setOptionFromRoot(resellerid, option, value, *isfranch)
+  if isfranch
     @driver.navigate.to "http://root.abcp.ru/?page=reseller_edit_options&resellerId=#{resellerid}" #ищем в руте нашего реселлера по resellerid
     resellername = @city.to_s.downcase #если франч, то присваиваем имени реселлера город франча в нижнем регистре
+  else
+    @driver.navigate.to "http://root.abcp.ru/?search=#{resellerid}&page=customers" #ищем в руте нашего реселлера по resellerid
+    resellername = @driver.find_element(:xpath, "//*/td[1]/span/a[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
+    @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера
   end
   begin
     @driver.find_element(:xpath, "//*[contains(text(),'Редактирование реселлера #{resellername}')]") #находим строчку, которая указывает на то, что мы редактируем нашего тестового реселлера
@@ -120,6 +120,6 @@ def setOptionFromRoot(isfranch, resellerid, option, value)
     end
     @driver.find_element(:id, 'submit').click #сохраняем
   rescue
-    raise 'Редактирование опций чужого реселлера!'
+    puts 'Редактирование опций чужого реселлера!'
   end
 end
