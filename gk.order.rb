@@ -1,7 +1,7 @@
 #!/bin/env ruby
 # encoding: utf-8
 
-def gkOrder(browser, link)
+def gkOrder(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
@@ -37,5 +37,5 @@ def gkOrder(browser, link)
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit if !@options[:aio]
+  @driver.quit unless @options[:aio]
 end

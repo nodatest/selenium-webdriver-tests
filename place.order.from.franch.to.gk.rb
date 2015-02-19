@@ -2,13 +2,12 @@
 # encoding: utf-8
 
 def placeOrderFromFranchToGk(browser)
-  franchiseeOrder(browser) if @orderid.nil? #делаем заказ под франчем, если он не был сделан
+  franchiseeOrder(browser) unless @orderid #делаем заказ под франчем, если он не был сделан
 
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
   puts '===== Отправка заказа франча в ГК ====='
-
   #логинимся в ПУ под франчем
   cpLogin(@cpfranchlogin, @cpfranchpass)
 
@@ -26,11 +25,9 @@ def placeOrderFromFranchToGk(browser)
   @driver.find_element(:link, 'Заказы').click #переходим на вкладку "Заказы"
   @driver.find_element(:link, "#{reorderid}").click #кликаем по нашему заказу
 
-  @orderid = nil #задаём пустым номер заказа для того, чтобы сделать заказ на существующем франче под существующим юзером
-
   #скидываем данные в лог
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit if !@options[:aio]
+  @driver.quit unless @options[:aio]
 end

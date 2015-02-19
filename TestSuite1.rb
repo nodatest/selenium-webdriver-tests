@@ -37,14 +37,14 @@ else
       startBrowser(@browser[i]) if @options[:aio]
 
       #выполняем тесты
-      #formycar_noindex_existence(@browser[i])
-      #formycar_no_redirect_and_available_results(@browser[i])
-      #service_sites_noindex_existence(@browser[i])
-      #formycar_noindex_miss(@browser[i])
+      formycar_noindex_existence(@browser[i])
+      formycar_no_redirect_and_available_results(@browser[i])
+      service_sites_noindex_existence(@browser[i])
+      formycar_noindex_miss(@browser[i])
 
       createFranchisee(@browser[i])
-      gkOrder(@browser[i], @link)
-      franchiseeOrder(@browser[i], @link)
+      gkOrder(@browser[i])
+      franchiseeOrder(@browser[i])
       placeOrderFromFranchToGk(@browser[i])
 
       #если установлен параметр запуска тестов в одном бразуере

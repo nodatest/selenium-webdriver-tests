@@ -24,5 +24,5 @@ def createFranchisee(browser)
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit if !@options[:aio]
+  @driver.quit unless @options[:aio]
 end

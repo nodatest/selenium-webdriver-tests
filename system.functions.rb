@@ -5,6 +5,7 @@ require 'logger'
 require 'unicode'
 
 #класс конвертации русских букв в различные регистры
+
 class String
   def downcase
     Unicode::downcase(self)
@@ -90,7 +91,7 @@ end
 # + включения логирования в файл
 def checkparametersandlog(browser)
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  startBrowser(browser) if !@options[:aio]
+  startBrowser(browser) unless @options[:aio]
 
   #если установлен параметр запуска бразуера в полнооконном режиме
   @driver.manage.window.maximize if @options[:fullscreen]

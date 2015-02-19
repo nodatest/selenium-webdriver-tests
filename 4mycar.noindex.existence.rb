@@ -18,20 +18,19 @@ def formycar_noindex_existence(browser)
   puts "#{time} переходим по ссылке #{link}"
 
   #проверяем наличие noindex в комментариях
-=begin
-  result = @driver.find_elements(:xpath, "//comment()[contains(.,'noindex')]").count
-  puts result
-=end
+  result = @driver.find_elements(:xpath, "//*[comment()[contains(.,'noindex')]]").count
+  if result == 2
+    puts "#{time} noindex в комментариях встречается 2 раза"
+  else
+    puts "#{time} Ошибка! noindex в комментариях встречается не 2 раза, а #{result} раз(а)"
+  end
 
   #проверяем отсутствие noindex в результатах
   puts "#{time} проверяем отсутствие noindex в результатах"
-  begin
-    result = !@driver.find_elements(:xpath, "//div[@id='searchResultsDiv']//noindex")
-  rescue
+  result = @driver.find_elements(:xpath, "//*[@id='searchResultsDiv']//noindex").count
+  if result > 0
     puts "#{time} Ошибка! noindex в результатах есть!"
-  end
-
-  if !result
+  else
     puts "#{time} noindex в результатах нет"
   end
 
@@ -39,5 +38,5 @@ def formycar_noindex_existence(browser)
   $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit if !@options[:aio]
+  @driver.quit unless @options[:aio]
 end

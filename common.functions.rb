@@ -106,7 +106,7 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
     resellername = @city.to_s.downcase #если франч, то присваиваем имени реселлера город франча в нижнем регистре
   else
     @driver.navigate.to "http://root.abcp.ru/?search=#{resellerid}&page=customers" #ищем в руте нашего реселлера по resellerid
-    resellername = @driver.find_element(:xpath, "//*/td[1]/span/a[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
+    resellername = @driver.find_element(:xpath, "//*[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
     @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера
   end
   begin
@@ -118,8 +118,8 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
     rescue #иначе опция уже добавлена реселлеру
       @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение опции
     end
-    @driver.find_element(:id, 'submit').click #сохраняем
   rescue
     puts 'Редактирование опций чужого реселлера!'
   end
+  @driver.find_element(:id, 'submit').click #сохраняем
 end

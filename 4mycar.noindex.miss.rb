@@ -35,5 +35,5 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
   end
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit if !@options[:aio]
+  @driver.quit unless @options[:aio]
 end
