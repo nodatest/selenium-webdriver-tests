@@ -4,8 +4,8 @@ require 'optparse'
 require 'logger'
 require 'unicode'
 
+=begin
 #класс конвертации русских букв в различные регистры
-
 class String
   def downcase
     Unicode::downcase(self)
@@ -31,6 +31,7 @@ class String
     self.replace capitalize
   end
 end
+=end
 
 #класс для одновременного логирования в терминал и в файл
 class MultiDelegator

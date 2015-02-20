@@ -38,17 +38,17 @@ def addFranchisee(clientname, email)
   sleep 3 #сек
   @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда имя клиента не успевает попасть в список
   @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим именем из выпадающего списка
-  @driver.find_element(:name, 'email').send_keys("franch_#{email}") #вводим email
+  @driver.find_element(:name, 'email').send_keys("test_franch_#{email}") #вводим email
   begin
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
     parsed = JSON.parse(json) #парсим json-ответ
     begin
-      @city = parsed[rand(0..parsed.size)]['name']
+      city = "test_#{parsed[rand(0..parsed.size)]['name']}"
     rescue
-      puts @city #отладка
+      puts city #отладка
     end
-  end until @city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
-  @driver.find_element(:name, 'city').send_keys(@city) #вводим название города
+  end until city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
+  @driver.find_element(:name, 'city').send_keys(city) #вводим название города
   @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
   @cpfranchlogin = @driver.find_element(:xpath, '//*/div[1]/strong[1]').text #сохраняем логин для входа
   @cpfranchpass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
@@ -101,10 +101,10 @@ end
 
 #функция установки значения опции реселлера/франча через рут
 def setOptionFromRoot(resellerid, option, value, *isfranch)
-  if isfranch
+  if isfranch #если франч, то
     @driver.navigate.to "http://root.abcp.ru/?page=reseller_edit_options&resellerId=#{resellerid}" #ищем в руте нашего реселлера по resellerid
-    resellername = @city.to_s.downcase #если франч, то присваиваем имени реселлера город франча в нижнем регистре
-  else
+    resellername = 'test_' #присваиваем имени реселлера префикс города франча
+  else #иначе
     @driver.navigate.to "http://root.abcp.ru/?search=#{resellerid}&page=customers" #ищем в руте нашего реселлера по resellerid
     resellername = @driver.find_element(:xpath, "//*[contains(text(),'#{resellerid}']../../../tr[2]/td[2]/div/a[1]") #сохраняем имя ресселлера, соответствующее id
     @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера

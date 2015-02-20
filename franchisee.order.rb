@@ -18,11 +18,12 @@ def franchiseeOrder(browser)
   #авторизируемся в ПУ франчайзи
   cpLogin(@cpfranchlogin, @cpfranchpass)
 
-  clientname = "user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
+  clientname = "test_user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
   email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
 
   #создание клиента
   createClient(clientname, email, 0)
+
   link = @driver.find_element(:xpath, '//*/tr[3]/td/a[1]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
   link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
 
