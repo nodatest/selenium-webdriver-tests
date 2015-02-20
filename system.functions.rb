@@ -2,6 +2,7 @@
 # encoding: utf-8
 require 'optparse'
 require 'logger'
+=begin
 require 'unicode'
 
 =begin
