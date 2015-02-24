@@ -7,7 +7,7 @@ def formycar_no_redirect_and_available_results(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
-  puts '===== Проверка отсутствие редиректа и наличия на странице результатов на 4mycar ====='
+  puts '===== Проверка отсутствие редиректа и наличия на странице результатов на 4mycar ====='.colorize(:green)
 
   #задаём адрес ссылки
   puts "#{time} задаём адрес ссылки"
@@ -22,18 +22,22 @@ def formycar_no_redirect_and_available_results(browser)
   if @driver.current_url == link then
     puts "#{time} Редиректа нет"
   else
-    puts "#{time} Ошибка! Редирект есть!"
+    puts "#{time} Ошибка! Редирект есть!".colorize(:red)
+    @errors += 1
   end
 
   #проверяем наличие на странице результатов
   puts "#{time} проверяем наличие на странице результатов"
   begin
-    result = !@driver.find_element(:id, 'searchResultsDiv')
+    @driver.find_element(:id, 'searchResultsDiv')
+    puts "#{time} Результаты есть"
   rescue
-    puts "#{time} Ошибка! Результатов нет!"
+    puts "#{time} Ошибка! Результатов нет!".colorize(:red)
+    @errors += 1
   end
 
-  puts "#{time} Результаты есть" if !result
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+  puts "info: кол-во ошибок в тесте - #{@errors}"
 
   #скидываем данные в лог
   $stdout.flush

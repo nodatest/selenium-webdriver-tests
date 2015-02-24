@@ -7,7 +7,7 @@ def formycar_noindex_existence(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
-  puts '===== Проверка отсутствие noindex в результатах и наличия noindex в комментариях на 4mycar ====='
+  puts '===== Проверка отсутствие noindex в результатах и наличия noindex в комментариях на 4mycar ====='.colorize(:green)
 
   #задаём адрес ссылки
   puts "#{time} задаём адрес ссылки"
@@ -22,17 +22,22 @@ def formycar_noindex_existence(browser)
   if result == 2
     puts "#{time} noindex в комментариях встречается 2 раза"
   else
-    puts "#{time} Ошибка! noindex в комментариях встречается не 2 раза, а #{result} раз(а)"
+    puts "#{time} Ошибка! noindex в комментариях встречается не 2 раза, а #{result} раз(а)".colorize(:red)
+    @error += 1
   end
 
   #проверяем отсутствие noindex в результатах
   puts "#{time} проверяем отсутствие noindex в результатах"
   result = @driver.find_elements(:xpath, "//*[@id='searchResultsDiv']//noindex").count
   if result > 0
-    puts "#{time} Ошибка! noindex в результатах есть!"
+    puts "#{time} Ошибка! noindex в результатах есть!".colorize(:red)
+    @error += 1
   else
     puts "#{time} noindex в результатах нет"
   end
+
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+  puts "info: кол-во ошибок в тесте - #{@errors}"
 
   #скидываем данные в лог
   $stdout.flush

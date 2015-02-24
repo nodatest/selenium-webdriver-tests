@@ -6,7 +6,7 @@ def createFranchisee(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
-  puts '===== Создание франчайзи ====='
+  puts '===== Создание франчайзи ====='.colorize(:green)
 
   #получение ссылки в руте для перехода в пу
   cpLoginFromRoot
@@ -19,6 +19,11 @@ def createFranchisee(browser)
 
   #добавление франчайзи
   addFranchisee(clientname, email)
+
+  @errors += 1 unless @franchid
+
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+  puts "info: кол-во ошибок в тесте - #{@errors}"
 
   #скидываем данные в лог
   $stdout.flush

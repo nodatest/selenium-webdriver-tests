@@ -12,35 +12,33 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
-  puts '===== Проверка наличия noindex, nofollow на страницах сервисных сайтов ====='
+  puts '===== Проверка наличия noindex, nofollow на страницах сервисных сайтов ====='.colorize(:green)
+  puts "#{time} задаём адрес ссылки, переходим по ссылке, удаляем все куки, проверяем наличие noindex, nofollow на страницах"
 
   for index1 in 1 ... sites.size
     for index2 in 0 ... pages.size
       #задаём адрес ссылки
-      puts "#{time} задаём адрес ссылки"
       link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"
       #переходим по ссылке
-      puts "#{time} переходим по ссылке #{link}"
       @driver.navigate.to link
       #удаляем все куки
-      puts "#{time} удаляем все куки"
       @driver.manage.delete_all_cookies
       #проверяем наличие noindex, nofollow на странице
-      puts "#{time} проверяем наличие noindex, nofollow на странице"
       begin
         result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
       rescue
-        puts "#{time} Ошибка! noindex [tecdoc] отсутствует!"
+        puts "#{time} Ошибка! noindex на #{link} отсутствует!".colorize(:red)
+        @errors += 1
       end
-      if result == 1
-        puts "#{time} 1 noindex [tecdoc] присутствует"
-      else
-        puts "#{time} Ошибка! noindex [tecdoc] больше, чем 1!"
-      end
+      puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red) if result > 1
+
       #скидываем данные в лог
       $stdout.flush
     end
   end
+
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+  puts "info: кол-во ошибок в тесте - #{@errors}"
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
   @driver.quit unless @options[:aio]

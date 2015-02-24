@@ -5,7 +5,7 @@ def gkOrder(browser)
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
 
-  puts '===== Добавление заказа на сайте ГК ====='
+  puts '===== Добавление заказа на сайте ГК ====='.colorize(:green)
 
   #получение ссылки в руте для перехода в пу
   cpLoginFromRoot
@@ -19,6 +19,7 @@ def gkOrder(browser)
   link = @driver.find_element(:xpath, '//*[@class="linkTempLogin"]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
   link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
 
+  puts "#{time} переходим на сайт под клиентом"
   @driver.navigate.to link #переходим на сайт под клиентом
 
   #поиск
@@ -27,11 +28,17 @@ def gkOrder(browser)
   #добавляем товар в корзину
   addToCart
 
+  puts "#{time} кликаем по кнопке 'Оформить заказ'"
   #кликаем по кнопке "Оформить заказ"
   @driver.find_element(:xpath, '//*[@value="Оформить заказ"]').click
 
   #отправляем заказ
   sendOrder
+
+  @errors += 1 unless @orderid
+
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+  puts "info: кол-во ошибок в тесте - #{@errors}"
 
   #скидываем данные в лог
   $stdout.flush

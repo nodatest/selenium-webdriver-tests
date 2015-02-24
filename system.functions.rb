@@ -56,12 +56,12 @@ end
 
 #время начала выполнения теста
 def time()
-  time = Time.now.strftime('%d-%m-%Y %H-%M-%S')
+  time = Time.now.strftime('%d-%m-%Y %H-%M-%S')[11, 8]
 end
 
 #дата
 def date
-  date = time[0, 10]
+  date = Time.now.strftime('%d-%m-%Y %H-%M-%S')[0, 10]
 end
 
 #параметры в командной строке
@@ -76,7 +76,22 @@ def options
     opts.on('-n', '--name NAME', 'test name') { |n| @options[:name] = n }
   end.parse!
 
-  @lan = '.lan' if @options[:lan]
+  if @options[:aio]
+    puts 'info: тесты выполняются в одном браузере'
+  else
+    puts 'info: каждый тест в отдельном браузере'
+  end
+
+  puts 'info: запускаем весь тестовый набор' unless @options[:name]
+
+  if @options[:lan]
+    @lan = '.lan'
+    puts 'info: локальный запуск'
+  else
+    puts 'info: нелокальный запуск'
+  end
+
+  puts 'info: во весь экран' if @options[:fullscreen]
 
   #задаём массив браузеров в зависимости от переданного параметра -b
   case @options[:browser]
@@ -87,20 +102,24 @@ def options
     else
       @browser = %w(chrome firefox)
   end
+
+  if @options[:name]
+    puts "info: используемый бразуер: #{@browser[0]}"
+  else
+    puts "info: используемые бразуеры: #{@browser}"
+  end
 end
 
-#функция проверки параметров запуска тестов в одном бразуере и запуска бразуера в полнооконном режиме
-# + включения логирования в файл
+#функция проверки параметров запуска тестов в одном бразуере + включения логирования в файл
 def checkparametersandlog(browser)
+  @errors = 0 # задаём кол-во ошибок в начале теста
+
   #если НЕ установлен параметр запуска тестов в одном бразуере
   startBrowser(browser) unless @options[:aio]
 
-  #если установлен параметр запуска бразуера в полнооконном режиме
-  @driver.manage.window.maximize if @options[:fullscreen]
-
   #лог выполнения тестов
   log_file = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
-  $stdout = MultiDelegator.delegate(:write, :close, :puts, :print, :flush).to(STDOUT, log_file)
+  $stdout = MultiDelegator.delegate(:write, :close, :puts, :flush).to(STDOUT, log_file)
 end
 
 #функция запуска браузера
@@ -113,4 +132,7 @@ def startBrowser(browser)
   else
     @driver.manage.timeouts.implicit_wait = 5 # seconds
   end
+
+  #если установлен параметр запуска бразуера в полнооконном режиме
+  @driver.manage.window.maximize if @options[:fullscreen]
 end
