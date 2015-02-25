@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require 'selenium-webdriver'
+require 'colorize'
 require_relative 'system.functions'
 require_relative 'common.functions'
 require_relative '4mycar.no.redirect.and.available.results'
@@ -12,7 +13,6 @@ require_relative 'create.franchisee'
 require_relative 'gk.order'
 require_relative 'franchisee.order'
 require_relative 'place.order.from.franch.to.gk'
-require 'colorize'
 
 #выводим ошибки ruby в файл
 $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
@@ -61,9 +61,9 @@ else
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]
+      puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}"
     end
 
-    puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}"
     puts 'ждём 1 час...'
     #ждём 1 час
     sleep 3600

@@ -31,14 +31,14 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
         @errors += 1
       end
       puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red) if result > 1
-
-      #скидываем данные в лог
-      $stdout.flush
     end
   end
 
   @totalerrors += @errors #прибавляем кол-во ошибок к общему
   puts "info: кол-во ошибок в тесте - #{@errors}"
+
+  #скидываем данные в лог
+  $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
   @driver.quit unless @options[:aio]

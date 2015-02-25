@@ -26,14 +26,13 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
       puts "#{time} Ошибка! noindex на #{link} присутствует #{result} раз(а)!".colorize(:red)
       @error += 1
     end
-
-    @totalerrors += @errors #прибавляем кол-во ошибок к общему
-
-    #скидываем данные в лог
-    $stdout.flush
   end
 
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
   puts "info: кол-во ошибок в тесте - #{@errors}"
+
+  #скидываем данные в лог
+  $stdout.flush
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
   @driver.quit unless @options[:aio]
