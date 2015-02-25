@@ -26,7 +26,7 @@ if @options[:name]
 
   #игнорируем параметр запуска тестов в одном бразуере
   @options[:aio] = false
-  puts "info: запускаем конкретный тест"
+  puts "info: запускаем конкретный тест".colorize(:blue)
 
   #если установлен параметр запуска тестов в одном бразуере
   startBrowser(@browser[0]) if @options[:aio]
@@ -34,7 +34,7 @@ if @options[:name]
   #выполняем тест
   send("#{@options[:name]}".to_sym, @browser[0])
 
-  puts "info: общее кол-во ошибок - #{@totalerrors}"
+  puts "info: общее кол-во ошибок - #{@totalerrors}".colorize(:blue)
 
   #если установлен параметр запуска тестов в одном бразуере
   @driver.quit if @options[:aio]
@@ -44,6 +44,24 @@ else
     @totalerrors = 0 #задаём кол-во ошибок в начале выполнения тестового набора
 
     for i in 0 ... @browser.size
+
+      puts 'info: тестовый набор запущен'.colorize(:blue)
+
+      if @options[:aio]
+        puts 'info: тесты выполняются в одном браузере'
+      else
+        puts 'info: каждый тест в отдельном браузере'
+      end
+
+      if @options[:lan]
+        puts 'info: локальный запуск'
+      else
+        puts 'info: нелокальный запуск'
+      end
+
+      puts 'info: во весь экран' if @options[:fullscreen]
+
+      puts "info: используемый бразуер: #{@browser[i]}" unless @options[:name]
 
       #если установлен параметр запуска тестов в одном бразуере
       startBrowser(@browser[i]) if @options[:aio]
@@ -61,7 +79,7 @@ else
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]
-      puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}"
+      puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}".colorize(:blue)
     end
 
     puts 'ждём 1 час...'

@@ -7,38 +7,40 @@ def gkOrder(browser)
 
   puts '===== Добавление заказа на сайте ГК ====='.colorize(:green)
 
-  #получение ссылки в руте для перехода в пу
-  cpLoginFromRoot
+  begin
+    #получение ссылки в руте для перехода в пу
+    cpLoginFromRoot
 
-  clientname = "test_user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
-  email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
+    clientname = "test_user_#{rand(1..1000000).to_s}" #генерируем случайное имя клиента
+    email = "#{clientname}@selenium.noda.pro" #генерируем мыло c именем клиента
 
-  #создание клиента
-  createClient(clientname, email, 0)
+    #создание клиента
+    createClient(clientname, email, 0)
 
-  link = @driver.find_element(:xpath, '//*[@class="linkTempLogin"]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
-  link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
+    link = @driver.find_element(:xpath, '//*[@class="linkTempLogin"]').attribute('href') #получаем адрес ссылки для перехода на сайт под клиентом
+    link['http://selenium.noda.pro'] = "http://selenium.noda.pro#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
 
-  puts "#{time} переходим на сайт под клиентом"
-  @driver.navigate.to link #переходим на сайт под клиентом
+    puts "#{time} переходим на сайт под клиентом"
+    @driver.navigate.to link #переходим на сайт под клиентом
 
-  #поиск
-  search('Febi', '01089')
+    #поиск
+    search('Febi', '01089')
 
-  #добавляем товар в корзину
-  addToCart
+    #добавляем товар в корзину
+    addToCart
 
-  puts "#{time} кликаем по кнопке 'Оформить заказ'"
-  #кликаем по кнопке "Оформить заказ"
-  @driver.find_element(:xpath, '//*[@value="Оформить заказ"]').click
+    puts "#{time} кликаем по кнопке 'Оформить заказ'"
+    #кликаем по кнопке "Оформить заказ"
+    @driver.find_element(:xpath, '//*[@value="Оформить заказ"]').click
 
-  #отправляем заказ
-  sendOrder
-
-  @errors += 1 unless @orderid
+    #отправляем заказ
+    sendOrder
+  rescue
+    @errors += 1
+  end
 
   @totalerrors += @errors #прибавляем кол-во ошибок к общему
-  puts "info: кол-во ошибок в тесте - #{@errors}"
+  puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:green)
 
   #скидываем данные в лог
   $stdout.flush

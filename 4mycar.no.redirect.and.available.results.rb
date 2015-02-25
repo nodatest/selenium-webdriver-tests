@@ -9,35 +9,39 @@ def formycar_no_redirect_and_available_results(browser)
 
   puts '===== Проверка отсутствие редиректа и наличия на странице результатов на 4mycar ====='.colorize(:green)
 
-  #задаём адрес ссылки
-  puts "#{time} задаём адрес ссылки"
-  link = "http://4mycar.ru#{@lan.to_s}/parts/Liqui%20moly/3970"
-
-  #переходим по ссылке
-  puts "#{time} переходим по ссылке #{link}"
-  @driver.navigate.to link
-
-  #проверяем, что нет редиректа
-  puts "#{time} проверяем, что нет редиректа"
-  if @driver.current_url == link then
-    puts "#{time} Редиректа нет"
-  else
-    puts "#{time} Ошибка! Редирект есть!".colorize(:red)
-    @errors += 1
-  end
-
-  #проверяем наличие на странице результатов
-  puts "#{time} проверяем наличие на странице результатов"
   begin
-    @driver.find_element(:id, 'searchResultsDiv')
-    puts "#{time} Результаты есть"
+    #задаём адрес ссылки
+    puts "#{time} задаём адрес ссылки"
+    link = "http://4mycar.ru#{@lan.to_s}/parts/Liqui%20moly/3970"
+
+    #переходим по ссылке
+    puts "#{time} переходим по ссылке #{link}"
+    @driver.navigate.to link
+
+    #проверяем, что нет редиректа
+    puts "#{time} проверяем, что нет редиректа"
+    if @driver.current_url == link then
+      puts "#{time} Редиректа нет"
+    else
+      puts "#{time} Ошибка! Редирект есть!".colorize(:red)
+      @errors += 1
+    end
+
+    #проверяем наличие на странице результатов
+    puts "#{time} проверяем наличие на странице результатов"
+    begin
+      @driver.find_element(:id, 'searchResultsDiv')
+      puts "#{time} Результаты есть"
+    rescue
+      puts "#{time} Ошибка! Результатов нет!".colorize(:red)
+      @errors += 1
+    end
   rescue
-    puts "#{time} Ошибка! Результатов нет!".colorize(:red)
     @errors += 1
   end
 
   @totalerrors += @errors #прибавляем кол-во ошибок к общему
-  puts "info: кол-во ошибок в тесте - #{@errors}"
+  puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:green)
 
   #скидываем данные в лог
   $stdout.flush

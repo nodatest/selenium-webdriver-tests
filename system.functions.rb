@@ -76,22 +76,7 @@ def options
     opts.on('-n', '--name NAME', 'test name') { |n| @options[:name] = n }
   end.parse!
 
-  if @options[:aio]
-    puts 'info: тесты выполняются в одном браузере'
-  else
-    puts 'info: каждый тест в отдельном браузере'
-  end
-
-  puts 'info: запускаем весь тестовый набор' unless @options[:name]
-
-  if @options[:lan]
-    @lan = '.lan'
-    puts 'info: локальный запуск'
-  else
-    puts 'info: нелокальный запуск'
-  end
-
-  puts 'info: во весь экран' if @options[:fullscreen]
+  @lan = '.lan' if @options[:lan]
 
   #задаём массив браузеров в зависимости от переданного параметра -b
   case @options[:browser]
@@ -101,12 +86,6 @@ def options
       @browser = %w(chrome)
     else
       @browser = %w(chrome firefox)
-  end
-
-  if @options[:name]
-    puts "info: используемый бразуер: #{@browser[0]}"
-  else
-    puts "info: используемые бразуеры: #{@browser}"
   end
 end
 

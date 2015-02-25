@@ -13,29 +13,33 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
   checkparametersandlog(browser)
 
   puts '===== Проверка наличия noindex, nofollow на страницах сервисных сайтов ====='.colorize(:green)
-  puts "#{time} задаём адрес ссылки, переходим по ссылке, удаляем все куки, проверяем наличие noindex, nofollow на страницах"
 
-  for index1 in 1 ... sites.size
-    for index2 in 0 ... pages.size
-      #задаём адрес ссылки
-      link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"
-      #переходим по ссылке
-      @driver.navigate.to link
-      #удаляем все куки
-      @driver.manage.delete_all_cookies
-      #проверяем наличие noindex, nofollow на странице
-      begin
-        result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
-      rescue
-        puts "#{time} Ошибка! noindex на #{link} отсутствует!".colorize(:red)
-        @errors += 1
+  begin
+    puts "#{time} задаём адрес ссылки, переходим по ссылке, удаляем все куки, проверяем наличие noindex, nofollow на страницах"
+    for index1 in 1 ... sites.size
+      for index2 in 0 ... pages.size
+        #задаём адрес ссылки
+        link = "http://#{sites[index1]}#{@lan.to_s}/?#{pages[index2]}"
+        #переходим по ссылке
+        @driver.navigate.to link
+        #удаляем все куки
+        @driver.manage.delete_all_cookies
+        #проверяем наличие noindex, nofollow на странице
+        begin
+          result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
+        rescue
+          puts "#{time} Ошибка! noindex на #{link} отсутствует!".colorize(:red)
+          @errors += 1
+        end
+        puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red) if result > 1
       end
-      puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red) if result > 1
     end
+  rescue
+    @errors += 1
   end
 
   @totalerrors += @errors #прибавляем кол-во ошибок к общему
-  puts "info: кол-во ошибок в тесте - #{@errors}"
+  puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:green)
 
   #скидываем данные в лог
   $stdout.flush
