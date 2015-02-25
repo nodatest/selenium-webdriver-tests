@@ -33,12 +33,5 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
     @error += 1
   end
 
-  @totalerrors += @errors #прибавляем кол-во ошибок к общему
-  puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:green)
-
-  #скидываем данные в лог
-  $stdout.flush
-
-  #если НЕ установлен параметр запуска тестов в одном бразуере
-  @driver.quit unless @options[:aio]
+  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

@@ -41,10 +41,9 @@ if @options[:name]
   puts 'info: единственный тест выполнен'
 else
   loop {
-    @totalerrors = 0 #задаём кол-во ошибок в начале выполнения тестового набора
-
     for i in 0 ... @browser.size
 
+      @totalerrors = 0 #задаём кол-во ошибок в начале выполнения тестового набора
       puts 'info: тестовый набор запущен'.colorize(:blue)
 
       if @options[:aio]

@@ -56,12 +56,12 @@ end
 
 #время начала выполнения теста
 def time()
-  time = Time.now.strftime('%d-%m-%Y %H-%M-%S')[11, 8]
+  time = Time.now.strftime('%H:%M:%S')
 end
 
 #дата
 def date
-  date = Time.now.strftime('%d-%m-%Y %H-%M-%S')[0, 10]
+  date = Time.now.strftime('%d-%m-%Y')
 end
 
 #параметры в командной строке
@@ -114,4 +114,21 @@ def startBrowser(browser)
 
   #если установлен параметр запуска бразуера в полнооконном режиме
   @driver.manage.window.maximize if @options[:fullscreen]
+end
+
+#функция подсчита ошибок, их вывода, сбрасывания записей в лог, выхода из браузера, если надо
+def countErrorsFlushLogBrowserQuit
+  @totalerrors += @errors #прибавляем кол-во ошибок к общему
+
+  if @errors == 0
+    puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:green)
+  else
+    puts "info: тест завершён. кол-во ошибок - #{@errors}".colorize(:red)
+  end
+
+  #скидываем данные в лог
+  $stdout.flush
+
+  #если НЕ установлен параметр запуска тестов в одном бразуере
+  @driver.quit unless @options[:aio]
 end

@@ -114,8 +114,8 @@ def addToCart
     sleep 1 #сек
     begin
       @driver.find_element(:xpath, '//*[@id="dialogConfirm"]') #проверяем не появляется ли модальное окно
-      puts "#{time} кликаем 'Да' в появившемся модальном окне"
       @driver.find_element(:xpath, '//*[class="ui-button-text"]').click #кликаем 'Да'
+      puts "#{time} кликаем 'Да' в появившемся модальном окне"
     rescue
       #модального окна нет
     end
@@ -190,7 +190,7 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
         @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение уже существующей опции
       end
     rescue
-      puts 'Редактирование опций чужого реселлера!'.colorize(:red)
+      puts 'error: Редактирование опций чужого реселлера!'.colorize(:red)
       @errors += 1
     end
     puts "#{time} кликаем на кнопке 'Сохранить'"
