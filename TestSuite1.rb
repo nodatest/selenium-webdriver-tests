@@ -34,11 +34,9 @@ if @options[:name]
   #выполняем тест
   send("#{@options[:name]}".to_sym, @browser[0])
 
-  puts "info: общее кол-во ошибок - #{@totalerrors}".colorize(:blue)
-
   #если установлен параметр запуска тестов в одном бразуере
   @driver.quit if @options[:aio]
-  puts 'info: единственный тест выполнен'
+  puts "info: единственный тест выполнен. кол-во ошибок - #{@totalerrors}".colorize(:blue)
 else
   loop {
     for i in 0 ... @browser.size

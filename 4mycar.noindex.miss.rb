@@ -27,10 +27,12 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
       if result > 0
         puts "#{time} Ошибка! noindex на #{link} присутствует #{result} раз(а)!".colorize(:red)
         @error += 1
+        @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
       end
     end
   rescue
     @error += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 
   countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо

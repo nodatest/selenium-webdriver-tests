@@ -25,6 +25,7 @@ def formycar_noindex_existence(browser)
     else
       puts "#{time} Ошибка! noindex в комментариях встречается не 2 раза, а #{result} раз(а)".colorize(:red)
       @error += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
 
     #проверяем отсутствие noindex в результатах
@@ -33,11 +34,13 @@ def formycar_noindex_existence(browser)
     if result > 0
       puts "#{time} Ошибка! noindex в результатах есть!".colorize(:red)
       @error += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     else
       puts "#{time} noindex в результатах нет"
     end
   rescue
     @error += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 
   countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо

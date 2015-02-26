@@ -25,6 +25,7 @@ def formycar_no_redirect_and_available_results(browser)
     else
       puts "#{time} Ошибка! Редирект есть!".colorize(:red)
       @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
 
     #проверяем наличие на странице результатов
@@ -35,6 +36,7 @@ def formycar_no_redirect_and_available_results(browser)
     rescue
       puts "#{time} Ошибка! Результатов нет!".colorize(:red)
       @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
   rescue
     @errors += 1

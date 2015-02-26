@@ -24,7 +24,10 @@ def placeOrderFromFranchToGk(browser)
     puts "#{time} кликаем по кнопке 'Отправить' в появившемся модальном окне"
     @driver.find_element(:xpath, '//*[@class="ui-dialog-buttonset"]/button[1]/span').click #кликаем по кнопке "Отправить" в появившемся модальном окне
     reorderid = @driver.find_element(:xpath, '//*[@id="placeOrderDialogContent"]/form/h4[2]').text.split[1] #берём второе слово из строки, которое является номером заказа в ГК
-    @errors += 1 if reorderid == 0 or nil
+    if reorderid == 0 or nil
+      @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    end
 
     #логинимся в рут
     cpLoginFromRoot
@@ -35,6 +38,7 @@ def placeOrderFromFranchToGk(browser)
     @driver.find_element(:link, "#{reorderid}").click #кликаем по нашему заказу
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 
   countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо

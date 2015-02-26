@@ -22,6 +22,7 @@ def createFranchisee(browser)
     addFranchisee(clientname, email)
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 
   countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо

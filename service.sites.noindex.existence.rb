@@ -30,12 +30,18 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
         rescue
           puts "#{time} Ошибка! noindex на #{link} отсутствует!".colorize(:red)
           @errors += 1
+          @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
         end
-        puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red) if result > 1
+        if result > 1
+          puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red)
+          @errors += 1
+          @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+        end
       end
     end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 
   countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо

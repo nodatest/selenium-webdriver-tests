@@ -6,7 +6,7 @@ require 'net/http'
 #получение ссылки в руте для перехода в пу
 def cpLoginFromRoot(resellername='selenium.noda.pro')
   begin
-    puts "#{time} переходим в  рут"
+    puts "#{time} переходим в рут"
     @driver.navigate.to 'http://root.abcp.ru/' #переходим в рут
     begin
       puts "#{time} вводим логин и пароль"
@@ -26,6 +26,7 @@ def cpLoginFromRoot(resellername='selenium.noda.pro')
     @driver.navigate.to link #переходим в пу под сотрудником нодасофт
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -43,9 +44,13 @@ def createClient(clientname, email, profileid)
     puts "#{time} нажимаем кнопку 'Создать'"
     @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
     @clientid = @driver.find_element(:xpath, '//*[contains(text(),"Системный код клиента:")]/../td') #сохраняем clientid
-    @errors += 1 if @clientid == 0 or nil
+    if @clientid == 0 or nil
+      @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -64,16 +69,17 @@ def addFranchisee(clientname, email)
     @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда имя клиента не успевает попасть в список
     @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим именем из выпадающего списка
     @driver.find_element(:name, 'email').send_keys("test_franch_#{email}") #вводим email
+    json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
+    parsed = JSON.parse(json) #парсим json-ответ
     begin
-      json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
-      parsed = JSON.parse(json) #парсим json-ответ
-      begin
-        city = "test_#{parsed[rand(0..parsed.size)]['name']}"
-      rescue
-        puts city.colorize(:red) #отладка
-        @errors += 1
-      end
-    end until city #до тех пор пока не спарсим удачно, т.к. почему-то не всегда удаётся
+      city = "test_#{parsed[rand(0..parsed.size)]['name']}"
+      city = 'test_печалька' unless city #если не спарсили удачно, то задаём принудительно, т.к. почему-то не всегда удаётся
+    rescue
+      puts "#{city}".colorize(:red) #отладка
+      puts parsed
+      @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    end
     @driver.find_element(:name, 'city').send_keys(city) #вводим название города
     puts "#{time} кликаем кнопку 'Добавить'"
     @driver.find_element(:xpath, '//*[@value="Добавить"]').click #кликаем кнопку "Добавить"
@@ -82,9 +88,13 @@ def addFranchisee(clientname, email)
     puts "#{time} переходим на вкладку 'Франчайзи'"
     @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
     @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
-    @errors += 1 if @franchid == 0 or nil
+    if @franchid == 0 or nil
+      @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -103,6 +113,7 @@ def search(brand, number)
     end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -121,6 +132,7 @@ def addToCart
     end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -136,9 +148,13 @@ def sendOrder
     puts "#{time} кликаем по кнопке 'Отправить заказ'"
     @driver.find_element(:xpath, '//*[@value="Отправить заказ"]').click #кликаем по кнопке "Отправить заказ"
     @orderid = @driver.find_element(:xpath, '//*/div[2]/div[*]/strong').text #сохраняем id заказа
-    @errors += 1 if @orderid == 0 or nil
+    if @orderid == 0 or nil
+      @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    end
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -160,6 +176,7 @@ def cpLogin(login, pass)
     @driver.find_element(:id, 'go').click #кликаем по кнопке 'Войти'
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
 
@@ -192,10 +209,12 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
     rescue
       puts 'error: Редактирование опций чужого реселлера!'.colorize(:red)
       @errors += 1
+      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
     puts "#{time} кликаем на кнопке 'Сохранить'"
     @driver.find_element(:id, 'submit').click #сохраняем
   rescue
     @errors += 1
+    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
   end
 end
