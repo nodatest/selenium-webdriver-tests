@@ -7,8 +7,8 @@ def placeOrderFromFranchToGk(browser)
 
   @name = 'Отправка заказа франча в ГК'
 
-    #проверяем часть переданных параметров командной строки и включаем логирование
-    checkparametersandlog(browser)
+  #проверяем часть переданных параметров командной строки и включаем логирование
+  checkparametersandlog(browser)
 
   begin
     #логинимся в ПУ под франчем
@@ -26,8 +26,9 @@ def placeOrderFromFranchToGk(browser)
     puts "#{time} кликаем по кнопке 'Отправить' в появившемся модальном окне"
     @driver.find_element(:xpath, '//*[@class="ui-dialog-buttonset"]/button[1]/span').click #кликаем по кнопке "Отправить" в появившемся модальном окне
     reorderid = @driver.find_element(:xpath, '//*[@id="placeOrderDialogContent"]/form/h4[2]').text.split[1] #берём второе слово из строки, которое является номером заказа в ГК
-    if reorderid == 0 or nil
-      raise 'Пустой/нулевой номер перезаказа'
+    if reorderid == /(\d{7,8}|0)/ or nil
+      @errors += 1
+      raise "Неверный номер перезаказа #{reorderid}"
     end
 
     #логинимся в рут

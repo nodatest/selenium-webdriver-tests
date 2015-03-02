@@ -41,8 +41,9 @@ def createClient(clientname, email, profileid)
     puts "#{time} нажимаем кнопку 'Создать'"
     @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
     @clientid = @driver.find_element(:xpath, '//*[contains(text(),"Системный код клиента:")]/../td') #сохраняем clientid
-    if @clientid == 0 or nil
+    if @clientid == /(\d{6,7}|0)/ or nil
       @errors += 1
+      raise "Неверный id клиента #{@clientid}"
     end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
@@ -79,8 +80,9 @@ def addFranchisee(clientname, email)
     puts "#{time} переходим на вкладку 'Франчайзи'"
     @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
     @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
-    if @franchid == 0 or nil
-      raise 'Id франчайзи нулевой или отсутсвует!'
+    if @franchid == /(\d{6,7}|0)/ or nil
+      @errors += 1
+      raise "Неверный id франча #{@franchid}"
     end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
@@ -130,8 +132,9 @@ def sendOrder
     puts "#{time} кликаем по кнопке 'Отправить заказ'"
     @driver.find_element(:xpath, '//*[@value="Отправить заказ"]').click #кликаем по кнопке "Отправить заказ"
     @orderid = @driver.find_element(:xpath, '//*/div[2]/div[*]/strong').text #сохраняем id заказа
-    if @orderid == 0 or nil
-      raise 'Id заказа пустой или нулевой!'
+    if @orderid == /(\d{6,7}|0)/ or nil
+      @errors += 1
+      raise "Неверный id заказа #{@orderid}"
     end
     check = @driver.find_elements(:xpath, '//*[@class="headCity logged" and contains(text(),"test_")]').count #если заказ сделан на франче
     if check == 1
@@ -188,6 +191,7 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
         @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение уже существующей опции
       end
     else
+      @errors += 1
       raise 'Редактирование опций чужого реселлера!'
     end
     puts "#{time} кликаем на кнопке 'Сохранить'"
