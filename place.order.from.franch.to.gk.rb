@@ -3,7 +3,6 @@
 
 def placeOrderFromFranchToGk(browser)
 
-  puts @franchorderid
   franchiseeOrder(browser) unless @franchorderid #делаем заказ под франчем, если он не был сделан
 
   @name = 'Отправка заказа франча в ГК'

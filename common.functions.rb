@@ -134,7 +134,6 @@ def sendOrder
       raise 'Id заказа пустой или нулевой!'
     end
     check = @driver.find_elements(:xpath, '//*[@class="headCity logged" and contains(text(),"test_")]').count #если заказ сделан на франче
-    puts check
     if check == 1
       @franchorderid = @orderid #присваиваем номер заказа номеру заказа франча
     end
