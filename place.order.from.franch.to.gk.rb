@@ -2,13 +2,16 @@
 # encoding: utf-8
 
 def placeOrderFromFranchToGk(browser)
-  begin
-    franchiseeOrder(browser) unless @orderid #делаем заказ под франчем, если он не был сделан
+
+  puts @franchorderid
+  franchiseeOrder(browser) unless @franchorderid #делаем заказ под франчем, если он не был сделан
+
+  @name = 'Отправка заказа франча в ГК'
 
     #проверяем часть переданных параметров командной строки и включаем логирование
     checkparametersandlog(browser)
 
-    puts '===== Отправка заказа франча в ГК ====='.colorize(:green)
+  begin
     #логинимся в ПУ под франчем
     cpLogin(@cpfranchlogin, @cpfranchpass)
 
@@ -25,8 +28,7 @@ def placeOrderFromFranchToGk(browser)
     @driver.find_element(:xpath, '//*[@class="ui-dialog-buttonset"]/button[1]/span').click #кликаем по кнопке "Отправить" в появившемся модальном окне
     reorderid = @driver.find_element(:xpath, '//*[@id="placeOrderDialogContent"]/form/h4[2]').text.split[1] #берём второе слово из строки, которое является номером заказа в ГК
     if reorderid == 0 or nil
-      @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+      raise 'Пустой/нулевой номер перезаказа'
     end
 
     #логинимся в рут
@@ -37,9 +39,8 @@ def placeOrderFromFranchToGk(browser)
     puts "#{time} кликаем по нашему заказу"
     @driver.find_element(:link, "#{reorderid}").click #кликаем по нашему заказу
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

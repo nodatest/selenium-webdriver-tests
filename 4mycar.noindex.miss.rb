@@ -4,10 +4,10 @@
 #Проверка 4mycar на отсутствие noindex
 def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
 
+  @name = 'Проверка отсутствия noindex, nofollow на страницах 4mycar'
+
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Проверка отсутствия noindex, nofollow на страницах 4mycar ====='.colorize(:green)
 
   begin
     puts "#{time} задаём адрес ссылки, переходим по ссылке, удаляем все куки, проверяем отсутствие noindex, nofollow на страницах"
@@ -19,21 +19,15 @@ def formycar_noindex_miss(browser, sites = @sites, pages = @pages)
       #удаляем все куки
       @driver.manage.delete_all_cookies
       #проверяем отсутствие noindex, nofollow на странице
-      begin
-        result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
-      rescue
-        #noindex, nofollow на странице не найдены
-      end
-      if result > 0
+      result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
+      unless result == 0
         puts "#{time} Ошибка! noindex на #{link} присутствует #{result} раз(а)!".colorize(:red)
         @error += 1
-        @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
       end
     end
   rescue
-    @error += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

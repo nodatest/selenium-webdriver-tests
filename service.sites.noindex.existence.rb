@@ -9,10 +9,10 @@
 #Проверка сервисных cайтов на наличие noindex [tecdoc]
 def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
 
+  @name = 'Проверка наличия noindex, nofollow на страницах сервисных сайтов'
+
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Проверка наличия noindex, nofollow на страницах сервисных сайтов ====='.colorize(:green)
 
   begin
     puts "#{time} задаём адрес ссылки, переходим по ссылке, удаляем все куки, проверяем наличие noindex, nofollow на страницах"
@@ -25,24 +25,16 @@ def service_sites_noindex_existence(browser, sites = @sites, pages = @pages)
         #удаляем все куки
         @driver.manage.delete_all_cookies
         #проверяем наличие noindex, nofollow на странице
-        begin
-          result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
-        rescue
-          puts "#{time} Ошибка! noindex на #{link} отсутствует!".colorize(:red)
-          @errors += 1
-          @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
-        end
-        if result > 1
+        result = @driver.find_elements(:xpath, "//meta[@name='robots' and @content='noindex, nofollow']").count
+        unless result == 1
           puts "#{time} Ошибка! noindex на #{link} встречается #{result} раз(а)!".colorize(:red)
           @errors += 1
-          @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
         end
       end
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

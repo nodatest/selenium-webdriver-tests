@@ -3,10 +3,11 @@
 
 #функция создания франчайзи
 def createFranchisee(browser)
+
+  @name = 'Создание франчайзи'
+
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Создание франчайзи ====='.colorize(:green)
 
   begin
     #получение ссылки в руте для перехода в пу
@@ -21,9 +22,8 @@ def createFranchisee(browser)
     #добавление франчайзи
     addFranchisee(clientname, email)
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

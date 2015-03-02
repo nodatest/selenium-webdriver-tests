@@ -99,6 +99,7 @@ def checkparametersandlog(browser)
   #лог выполнения тестов
   log_file = File.open("../selenium-webdriver-logs/#{browser}_#{date}.txt", 'a')
   $stdout = MultiDelegator.delegate(:write, :close, :puts, :flush).to(STDOUT, log_file)
+  puts @name.colorize(:green)
 end
 
 #функция запуска браузера
@@ -116,8 +117,8 @@ def startBrowser(browser)
   @driver.manage.window.maximize if @options[:fullscreen]
 end
 
-#функция подсчита ошибок, их вывода, сбрасывания записей в лог, выхода из браузера, если надо
-def countErrorsFlushLogBrowserQuit
+#функция подсчёта всех ошибок, их вывода, сбрасывания записей в лог, выхода из браузера, если надо
+def countTotalErrorsFlushLogBrowserQuit
   @totalerrors += @errors #прибавляем кол-во ошибок к общему
 
   if @errors == 0
@@ -131,4 +132,21 @@ def countErrorsFlushLogBrowserQuit
 
   #если НЕ установлен параметр запуска тестов в одном бразуере
   @driver.quit unless @options[:aio]
+end
+
+#функция подсчёта ошибок и снятия скриншота
+def countErrorsTakeScreenshot
+  @errors += 1
+  @driver.save_screenshot("../screenshots/#{date} #{time} #{@name}.png")
+end
+
+#функция удаления старых скриншотов
+def deleteScreenshots(path, days)
+  files = Dir.new(path).entries #сохраняем имена файлов и директорий
+  files.delete('.') #избавляемся от стандартной директории (текущей)
+  files.delete('..') #избавляемся от стандартной директории (корневой)
+  files.each do |i|
+    file = "#{path}/#{i}" #прибавляем к имени путь
+    File.delete(file) if Time.now - File.ctime(file) > 60*60*24*days #удаляем файл, если он дата его создания больше days дней
+  end
 end

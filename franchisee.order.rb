@@ -4,12 +4,12 @@
 def franchiseeOrder(browser)
 
   #создаём франчайзи, если перед этим он не был создан
-  createFranchisee(browser) if @franchid.nil?
+  createFranchisee(browser) unless @franchid
+
+  @name = 'Добавление заказа на созданном франчайзи'
 
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Добавление заказа на созданном франчайзи ====='.colorize(:green)
 
   begin
     #логинимся в рут
@@ -44,9 +44,8 @@ def franchiseeOrder(browser)
     #отправляем заказ
     sendOrder
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

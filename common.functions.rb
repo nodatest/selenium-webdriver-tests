@@ -8,14 +8,12 @@ def cpLoginFromRoot(resellername='selenium.noda.pro')
   begin
     puts "#{time} переходим в рут"
     @driver.navigate.to 'http://root.abcp.ru/' #переходим в рут
-    begin
+    if @driver.find_elements(:css, '.inp').count > 0
       puts "#{time} вводим логин и пароль"
       @driver.find_element(:css, '.inp').send_keys('autotest') #вводим логин
       @driver.find_element(:name, 'pass').send_keys('123123') #вводим пароль
       puts "#{time} кликаем на кнопку вход"
       @driver.find_element(:name, 'go').click #кликаем на кнопку вход
-    rescue
-      #уже залогинены
     end
     puts "#{time} переходим по ссылке, которая отфильтровывает нашего тестового реселлера"
     @driver.navigate.to "http://root.abcp.ru/?search=#{resellername}&page=customers" #переходим по ссылке, которая отфильтровывает нашего тестового реселлера
@@ -25,8 +23,7 @@ def cpLoginFromRoot(resellername='selenium.noda.pro')
     puts "#{time} переходим в ПУ под Сотрудником НодаСофт"
     @driver.navigate.to link #переходим в пу под сотрудником нодасофт
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -46,11 +43,9 @@ def createClient(clientname, email, profileid)
     @clientid = @driver.find_element(:xpath, '//*[contains(text(),"Системный код клиента:")]/../td') #сохраняем clientid
     if @clientid == 0 or nil
       @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -73,12 +68,8 @@ def addFranchisee(clientname, email)
     parsed = JSON.parse(json) #парсим json-ответ
     begin
       city = "test_#{parsed[rand(0..parsed.size)]['name']}"
-      city = 'test_печалька' unless city #если не спарсили удачно, то задаём принудительно, т.к. почему-то не всегда удаётся
     rescue
-      puts "#{city}".colorize(:red) #отладка
-      puts parsed
-      @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+      city = 'test_печалька' unless city #если не спарсили удачно, то задаём принудительно, т.к. почему-то не всегда удаётся
     end
     @driver.find_element(:name, 'city').send_keys(city) #вводим название города
     puts "#{time} кликаем кнопку 'Добавить'"
@@ -89,12 +80,10 @@ def addFranchisee(clientname, email)
     @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
     @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
     if @franchid == 0 or nil
-      @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+      raise 'Id франчайзи нулевой или отсутсвует!'
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -105,15 +94,14 @@ def search(brand, number)
     @driver.find_element(:id, 'pcode').send_keys(number) #вводим поисковый запрос в строку поиска
     puts "#{time} кликаем по кнопке 'Найти'"
     @driver.find_element(:xpath, '//*[@alt="Найти"]').click #жмём кнопку "Найти"
-    begin
-      @driver.find_element(:xpath, "//*[contains(text(),'#{brand}')]/../..//*[contains(text(),'#{number}')]/..//*[contains(text(),'Цены и аналоги')]").click if @driver.find_element(:xpath, '//*[contains(text(),"Цены и аналоги")]').displayed?
+    if @driver.find_elements(:xpath, '//*[contains(text(),"Цены и аналоги")]').count > 0
       puts "#{time} первый этап поиска: кликаем по ссылке 'Цены и аналоги'"
-    rescue
+      @driver.find_element(:xpath, "//*[contains(text(),'#{brand}')]/../..//*[contains(text(),'#{number}')]/..//*[contains(text(),'Цены и аналоги')]").click
+    else
       puts "#{time} второй этап поиска"
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -123,38 +111,35 @@ def addToCart
     puts "#{time} жмём кнопку 'Добавить в корзину'"
     @driver.find_element(:xpath, '//*[@title="Купить"]').click #жмём кнопку добавить в корзину
     sleep 1 #сек
-    begin
-      @driver.find_element(:xpath, '//*[@id="dialogConfirm"]') #проверяем не появляется ли модальное окно
-      @driver.find_element(:xpath, '//*[class="ui-button-text"]').click #кликаем 'Да'
+    if @driver.find_elements(:xpath, '//*[@id="dialogConfirm"]').count > 0 #проверяем не появляется ли модальное окно
       puts "#{time} кликаем 'Да' в появившемся модальном окне"
-    rescue
-      #модального окна нет
+      @driver.find_element(:xpath, '//*[class="ui-button-text"]').click #кликаем 'Да'
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
 #отправка заказа
 def sendOrder
   begin
-    begin
+    if @driver.find_elements(:name, 'enableSendingSms').count > 0
       puts "#{time} снимаем чекбокс отправки смс"
       @driver.find_element(:name, 'enableSendingSms').click #снимаем чекбокс отправки смс
-    rescue
-      #чекбокс отсутствует
     end
     puts "#{time} кликаем по кнопке 'Отправить заказ'"
     @driver.find_element(:xpath, '//*[@value="Отправить заказ"]').click #кликаем по кнопке "Отправить заказ"
     @orderid = @driver.find_element(:xpath, '//*/div[2]/div[*]/strong').text #сохраняем id заказа
     if @orderid == 0 or nil
-      @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+      raise 'Id заказа пустой или нулевой!'
+    end
+    check = @driver.find_elements(:xpath, '//*[@class="headCity logged" and contains(text(),"test_")]').count #если заказ сделан на франче
+    puts check
+    if check == 1
+      @franchorderid = @orderid #присваиваем номер заказа номеру заказа франча
     end
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -163,11 +148,9 @@ def cpLogin(login, pass)
   begin
     puts "#{time} переходим в ПУ"
     @driver.navigate.to "http://cp.abcp.ru#{@lan}" #переходим в пу
-    begin
+    if @driver.find_elements(:link, 'Выйти').count == 1
       puts "#{time} разлогиниваемся в ПУ"
       @driver.find_element(:link, 'Выйти').click #разлогиниваемся в ПУ
-    rescue
-      #не залогинены
     end
     puts "#{time} вводим логин и пароль"
     @driver.find_element(:id, 'login').send_keys("#{login}") #вводим логин
@@ -175,8 +158,7 @@ def cpLogin(login, pass)
     puts "#{time} кликаем по кнопке 'Войти'"
     @driver.find_element(:id, 'go').click #кликаем по кнопке 'Войти'
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end
 
@@ -194,27 +176,24 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
       puts "#{time} переходим по ссылке редактирования опций реселлера"
       @driver.find_element(:xpath, "//*[@title='Опции #{resellername}']").click #переходим по ссылке редактирования опций реселлера
     end
-    begin
+    if @driver.find_elements(:xpath, "//*[contains(text(),'Редактирование реселлера #{resellername}')]").count == 1
       puts "#{time} находим строчку, которая указывает на то, что мы редактируем нашего тестового реселлера/франча"
       @driver.find_element(:xpath, "//*[contains(text(),'Редактирование реселлера #{resellername}')]") #находим строчку, которая указывает на то, что мы редактируем нашего тестового реселлера/франча
       sleep 1 #сек
-      begin
+      if @driver.find_elements(:xpath, "//*[@id='optionField']/option[@value='#{option}']").count == 1
         puts "#{time} выбираем новую опцию и выставляем ей значение"
         @driver.find_element(:xpath, "//*[@id='optionField']/option[@value='#{option}']").click #выбираем новую опцию
         @driver.find_element(:xpath, "//*[@id='valueField']/select/option[@value='#{value}']").click #выбираем значение новой опции
-      rescue #иначе опция уже добавлена реселлеру
+      else #иначе опция уже добавлена реселлеру
         puts "#{time} выбираем значение уже существующей опции"
         @driver.find_element(:xpath, "//*[@name='val_#{option}']/option[@value='#{value}']").click #выбираем значение уже существующей опции
       end
-    rescue
-      puts 'error: Редактирование опций чужого реселлера!'.colorize(:red)
-      @errors += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    else
+      raise 'Редактирование опций чужого реселлера!'
     end
     puts "#{time} кликаем на кнопке 'Сохранить'"
     @driver.find_element(:id, 'submit').click #сохраняем
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 end

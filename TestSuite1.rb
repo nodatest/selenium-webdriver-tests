@@ -79,6 +79,7 @@ else
       puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}".colorize(:blue)
     end
 
+    deleteScreenshots('../screenshots', 7) #удаляем скриншоты недельной давности
     puts 'ждём 1 час...'
     #ждём 1 час
     sleep 3600

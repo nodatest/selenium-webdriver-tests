@@ -2,10 +2,11 @@
 # encoding: utf-8
 
 def gkOrder(browser)
+
+  @name = 'Добавление заказа на сайте ГК'
+
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Добавление заказа на сайте ГК ====='.colorize(:green)
 
   begin
     #получение ссылки в руте для перехода в пу
@@ -36,9 +37,8 @@ def gkOrder(browser)
     #отправляем заказ
     sendOrder
   rescue
-    @errors += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end

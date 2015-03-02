@@ -4,10 +4,10 @@
 #Проверки на noindex
 def formycar_noindex_existence(browser)
 
+  @name = 'Проверка отсутствие noindex в результатах и наличия noindex в комментариях на 4mycar'
+
   #проверяем часть переданных параметров командной строки и включаем логирование
   checkparametersandlog(browser)
-
-  puts '===== Проверка отсутствие noindex в результатах и наличия noindex в комментариях на 4mycar ====='.colorize(:green)
 
   begin
     #задаём адрес ссылки
@@ -25,7 +25,6 @@ def formycar_noindex_existence(browser)
     else
       puts "#{time} Ошибка! noindex в комментариях встречается не 2 раза, а #{result} раз(а)".colorize(:red)
       @error += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     end
 
     #проверяем отсутствие noindex в результатах
@@ -34,14 +33,12 @@ def formycar_noindex_existence(browser)
     if result > 0
       puts "#{time} Ошибка! noindex в результатах есть!".colorize(:red)
       @error += 1
-      @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
     else
       puts "#{time} noindex в результатах нет"
     end
   rescue
-    @error += 1
-    @driver.save_screenshot("../screenshots/#{date} #{time} #{__method__.to_s}.png")
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
 
-  countErrorsFlushLogBrowserQuit #подсчитываем ошибки, выводим их, скидываем записи в лог, выходим из браузера, если надо
+  countTotalErrorsFlushLogBrowserQuit #подсчитываем общее кол-во ошибок, выводим их, скидываем записи в лог, выходим из браузера, если надо
 end
