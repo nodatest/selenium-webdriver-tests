@@ -13,9 +13,12 @@ require_relative 'create.franchisee'
 require_relative 'gk.order'
 require_relative 'franchisee.order'
 require_relative 'place.order.from.franch.to.gk'
+#require_relative 'market.email.notifications.for.comments'
 
 #выводим ошибки ruby в файл
 $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
+
+@resellername='selenium.noda.pro'
 
 #обрабатываем параметры командной строки
 options
@@ -74,12 +77,16 @@ else
       franchiseeOrder(@browser[i])
       placeOrderFromFranchToGk(@browser[i])
 
+      #market_email_notifications_for_comments(@browser[i])
+
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]
       puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}".colorize(:blue)
     end
 
     deleteScreenshots('../screenshots', 7) #удаляем скриншоты недельной давности
+    cpLoginFromRoot #логинимся на сайт из рута
+    deleteClients #удаляем клиентов
     puts 'ждём 1 час...'
     #ждём 1 час
     sleep 3600

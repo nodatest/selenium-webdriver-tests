@@ -4,7 +4,7 @@ require 'json'
 require 'net/http'
 
 #получение ссылки в руте для перехода в пу
-def cpLoginFromRoot(resellername='selenium.noda.pro')
+def cpLoginFromRoot(resellername=@resellername)
   begin
     puts "#{time} переходим в рут"
     @driver.navigate.to 'http://root.abcp.ru/' #переходим в рут
@@ -22,6 +22,11 @@ def cpLoginFromRoot(resellername='selenium.noda.pro')
     link['http://cp.abcp.ru'] = "http://cp.abcp.ru#{@lan}" #если передан параметр lan, то адрес ссылки меняется на локальный
     puts "#{time} переходим в ПУ под Сотрудником НодаСофт"
     @driver.navigate.to link #переходим в пу под сотрудником нодасофт
+    if @driver.find_elements(:xpath, "//*[contains(text(),'#{resellername}')]").count == 0 #проверяем, что мы перешли в ПУ выбранного
+      @errors += 1
+      puts "Выбран неверный реселлер '#{resellername}!".colorize(:red)
+      raise "Выбран неверный реселлер '#{resellername}!"
+    end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
@@ -41,8 +46,9 @@ def createClient(clientname, email, profileid)
     puts "#{time} нажимаем кнопку 'Создать'"
     @driver.find_element(:class, 'ui-button-text').click #нажимаем кнопку "создать"
     @clientid = @driver.find_element(:xpath, '//*[contains(text(),"Системный код клиента:")]/../td') #сохраняем clientid
-    if @clientid == /(\d{6,7}|0)/ or nil
+    if @clientid == /(\D{6,7}|0)/ or nil
       @errors += 1
+      puts "Неверный id клиента #{@clientid}".colorize(:red)
       raise "Неверный id клиента #{@clientid}"
     end
   rescue
@@ -63,6 +69,7 @@ def addFranchisee(clientname, email)
     @driver.find_element(:id, 'clientAliveSearch').send_keys(clientname) #вводим имя клиента
     sleep 3 #сек
     @driver.find_element(:id, 'clientAliveSearch').send_keys(' ') #костыль для случая, когда имя клиента не успевает попасть в список
+    sleep 1 #сек
     @driver.find_element(:xpath, "//*[contains(text(),'#{clientname}')]").click #кликаем по клиенту с нашим именем из выпадающего списка
     @driver.find_element(:name, 'email').send_keys("test_franch_#{email}") #вводим email
     json = Net::HTTP.get('address1.abcp.ru', '/city/getByRegionsCodes/?regionsCodes[0]='+rand(10..99).to_s) #get-запрос получения случайного города из address api
@@ -79,9 +86,10 @@ def addFranchisee(clientname, email)
     @cpfranchpass = @driver.find_element(:xpath, '//*/div[1]/strong[2]').text #сохраняем пароль для входа
     puts "#{time} переходим на вкладку 'Франчайзи'"
     @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
-    @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{@city}')]/../td[5]").text #сохраняем id франчайзи
-    if @franchid == /(\d{6,7}|0)/ or nil
+    @franchid = @driver.find_element(:xpath, "//*[contains(.,'#{city}')]/../td[5]").text #сохраняем id франчайзи
+    if @franchid == /(\D{6,7}|0)/ or nil
       @errors += 1
+      puts "Неверный id франча #{@franchid}".colorize(:red)
       raise "Неверный id франча #{@franchid}"
     end
   rescue
@@ -111,11 +119,17 @@ end
 def addToCart
   begin
     puts "#{time} жмём кнопку 'Добавить в корзину'"
-    @driver.find_element(:xpath, '//*[@title="Купить"]').click #жмём кнопку добавить в корзину
+    if @driver.find_elements(:xpath, '//*[@title="Купить"]').count > 0
+      @driver.find_element(:xpath, '//*[@title="Купить"]').click #жмём кнопку добавить в корзину
+    else
+      @errors += 1
+      puts 'Товара нет в наличии!'.colorize(:red)
+      raise 'Товара нет в наличии!'
+    end
     sleep 1 #сек
-    if @driver.find_elements(:xpath, '//*[@id="dialogConfirm"]').count > 0 #проверяем не появляется ли модальное окно
+    if @driver.find_elements(:xpath, '//*[@role="dialog"]').count == 1 #проверяем не появляется ли модальное окно
       puts "#{time} кликаем 'Да' в появившемся модальном окне"
-      @driver.find_element(:xpath, '//*[class="ui-button-text"]').click #кликаем 'Да'
+      @driver.find_element(:xpath, '//*[text()[class="ui-button-text"]]').click #кликаем 'Да'
     end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
@@ -132,8 +146,10 @@ def sendOrder
     puts "#{time} кликаем по кнопке 'Отправить заказ'"
     @driver.find_element(:xpath, '//*[@value="Отправить заказ"]').click #кликаем по кнопке "Отправить заказ"
     @orderid = @driver.find_element(:xpath, '//*/div[2]/div[*]/strong').text #сохраняем id заказа
-    if @orderid == /(\d{6,7}|0)/ or nil
+    if @orderid == /(\D{6,7}|0)/ or nil
+      puts @orderid
       @errors += 1
+      puts "Неверный id заказа #{@orderid}".colorize(:red)
       raise "Неверный id заказа #{@orderid}"
     end
     check = @driver.find_elements(:xpath, '//*[@class="headCity logged" and contains(text(),"test_")]').count #если заказ сделан на франче
@@ -159,6 +175,11 @@ def cpLogin(login, pass)
     @driver.find_element(:id, 'pass').send_keys("#{pass}") #вводим пароль
     puts "#{time} кликаем по кнопке 'Войти'"
     @driver.find_element(:id, 'go').click #кликаем по кнопке 'Войти'
+    if @driver.find_elements(:xpath, "//*[contains(text(),'#{@franchid}')]").count == 0
+      @errors += 1
+      puts "Залогинились под неверным франчем '#{@franchid}'!".colorize(:red)
+      raise "Залогинились под неверным франчем '#{@franchid}'!"
+    end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
@@ -192,10 +213,71 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
       end
     else
       @errors += 1
-      raise 'Редактирование опций чужого реселлера!'
+      puts "Редактирование опций чужого реселлера '#{resellername}'!".colorize(:red)
+      raise "Редактирование опций чужого реселлера '#{resellername}'!"
     end
     puts "#{time} кликаем на кнопке 'Сохранить'"
     @driver.find_element(:id, 'submit').click #сохраняем
+  rescue
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+  end
+end
+
+#функция удаления клиентов
+def deleteClients(days=6)
+  begin
+    puts "#{time} переходим на вкладку 'Клиенты'"
+    @driver.find_element(:link, 'Клиенты').click #кликаем на вкладке "Клиенты"
+    date = (Time.now - 60*60*24*days).strftime('%d.%m.%Y') #дата, до которой необходимо удалять клиентов
+    puts "#{time} вводим данные в поле 'Поиск'"
+    @driver.find_element(:name, 'filterCustomersBySearchString').send_keys('test_user_') #вбиваем в поле "поиск"
+    puts "#{time} вводим данные в поле 'Зарегестрированы по'"
+    @driver.find_element(:id, 'dateRegTo').send_keys(date) #вбиваем в поле "зарегестрированы по"
+    puts "#{time} кликаем на кнопке 'Найти'"
+    @driver.find_element(:xpath, '//*[@value="Найти"]').click #кликаем на кнопке "Найти"
+    sleep 3 #сек
+    puts "#{time} сохраняем id клиентов на каждой из страниц"
+    clients = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #сохраняем массив id клиентов на первой странице, преобразуя в текст
+    puts @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").count
+    while @driver.find_elements(:link, '>').count == 2 #до тех пор, пока есть кнопки следующей страницы
+      @driver.find_element(:link, '>').click unless @driver.find_elements(:link, '>').count == 0 #кликаем на ссылке следующей страницы, до тех пор, пока кнопки следующей страницы не пропадут
+      sleep 2 #сек
+      clients += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #добавляем в массив id клиентов на этой странице, преобразуя в текст
+      puts @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").count
+    end
+
+    puts "#{time} переходим по ссылке редактирования клиента и удаляем клиента"
+    clients.each do |i| #для каждого элемента массива выполняем
+      @driver.get("http://cp.abcp.ru/?page=customers&customerId=#{i}&action=editCustomer") #переходим по ссылке редактирования клиента
+      if @driver.find_elements(:xpath, "//*[contains(text(),'Системный код клиента:')]/../td[contains(text(),'#{i}')]").count == 1 #проверяем, что редактируем выбранного клиента
+        deleteButton = @driver.find_elements(:xpath, "//*[@value='Удалить учетную запись']")
+        if deleteButton.count == 1 #проверяем, что кнопка удаления есть на старнице
+          deleteButton[0].click #кликаем по кнопке
+          if @driver.find_elements(:xpath, "//*[contains(text(),'Вы действительно хотите удалить учётную запись пользователя?')]").count == 1 #проверяем, что появляется модальное окно
+            @driver.find_element(:xpath, "//*[@value='OK']").click #кликаем по кнопке "ОК" в модальном окне
+            if @driver.find_elements(:xpath, "//*[contains(text(),'Учетная запись клиента удалена!')]").count == 0 #если нет сообщения об успешном удалении
+              @errors += 1
+              puts 'Учетная запись клиента не удалена!'.colorize(:red)
+              raise 'Учетная запись клиента не удалена!'
+            else
+              puts "#{time} клиент #{i} удалён"
+            end
+          else
+            @errors += 1
+            puts 'Всплывающее окно не появилось!'.colorize(:red)
+            raise 'Всплывающее окно не появилось!'
+          end
+        else
+          @errors += 1
+          puts 'Кнопка "Удалить" отсутствует!'.colorize(:red)
+          raise 'Кнопка "Удалить" отсутствует!'
+        end
+      else
+        @errors += 1
+        puts "Выбран неверный id клиента #{i}!".colorize(:red)
+        raise "Выбран неверный id клиента #{i}!"
+      end
+    end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end

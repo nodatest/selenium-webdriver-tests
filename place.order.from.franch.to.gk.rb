@@ -26,8 +26,9 @@ def placeOrderFromFranchToGk(browser)
     puts "#{time} кликаем по кнопке 'Отправить' в появившемся модальном окне"
     @driver.find_element(:xpath, '//*[@class="ui-dialog-buttonset"]/button[1]/span').click #кликаем по кнопке "Отправить" в появившемся модальном окне
     reorderid = @driver.find_element(:xpath, '//*[@id="placeOrderDialogContent"]/form/h4[2]').text.split[1] #берём второе слово из строки, которое является номером заказа в ГК
-    if reorderid == /(\d{7,8}|0)/ or nil
+    if reorderid == /(\D{7,8}|0)/ or nil
       @errors += 1
+      puts "Неверный номер перезаказа #{reorderid}".colorize(:red)
       raise "Неверный номер перезаказа #{reorderid}"
     end
 
