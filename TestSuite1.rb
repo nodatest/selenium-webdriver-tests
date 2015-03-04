@@ -13,6 +13,7 @@ require_relative 'create.franchisee'
 require_relative 'gk.order'
 require_relative 'franchisee.order'
 require_relative 'place.order.from.franch.to.gk'
+require_relative 'post.actions'
 #require_relative 'market.email.notifications.for.comments'
 
 #выводим ошибки ruby в файл
@@ -84,9 +85,7 @@ else
       puts "info: тестовый набор выполнен, кол-во ошибок - #{@totalerrors}".colorize(:blue)
     end
 
-    deleteScreenshots('../screenshots', 7) #удаляем скриншоты недельной давности
-    cpLoginFromRoot #логинимся на сайт из рута
-    deleteClients #удаляем клиентов
+    postActions(@browser[0]) #выполняем пост-действия
     puts 'ждём 1 час...'
     #ждём 1 час
     sleep 3600

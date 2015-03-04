@@ -224,7 +224,7 @@ def setOptionFromRoot(resellerid, option, value, *isfranch)
 end
 
 #функция удаления клиентов
-def deleteClients(days=6)
+def deleteClients(days)
   begin
     puts "#{time} переходим на вкладку 'Клиенты'"
     @driver.find_element(:link, 'Клиенты').click #кликаем на вкладке "Клиенты"
@@ -238,14 +238,12 @@ def deleteClients(days=6)
     sleep 3 #сек
     puts "#{time} сохраняем id клиентов на каждой из страниц"
     clients = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #сохраняем массив id клиентов на первой странице, преобразуя в текст
-    puts @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").count
     while @driver.find_elements(:link, '>').count == 2 #до тех пор, пока есть кнопки следующей страницы
       @driver.find_element(:link, '>').click unless @driver.find_elements(:link, '>').count == 0 #кликаем на ссылке следующей страницы, до тех пор, пока кнопки следующей страницы не пропадут
       sleep 2 #сек
       clients += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #добавляем в массив id клиентов на этой странице, преобразуя в текст
-      puts @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").count
     end
-
+    puts "#{time} найдено #{clients.count} клиентов"
     puts "#{time} переходим по ссылке редактирования клиента и удаляем клиента"
     clients.each do |i| #для каждого элемента массива выполняем
       @driver.get("http://cp.abcp.ru/?page=customers&customerId=#{i}&action=editCustomer") #переходим по ссылке редактирования клиента
