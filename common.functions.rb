@@ -228,7 +228,8 @@ def deleteClients(days)
   begin
     puts "#{time} переходим на вкладку 'Клиенты'"
     @driver.find_element(:link, 'Клиенты').click #кликаем на вкладке "Клиенты"
-    date = (Time.now - 60*60*24*days).strftime('%d.%m.%Y') #дата, до которой необходимо удалять клиентов
+    days += 1
+    date = (Time.now - 60*60*24*days).strftime('%d.%m.%Y') #дата, по которую необходимо удалять клиентов
     puts "#{time} вводим данные в поле 'Поиск'"
     @driver.find_element(:name, 'filterCustomersBySearchString').send_keys('test_user_') #вбиваем в поле "поиск"
     puts "#{time} вводим данные в поле 'Зарегестрированы по'"
@@ -244,39 +245,87 @@ def deleteClients(days)
       clients += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #добавляем в массив id клиентов на этой странице, преобразуя в текст
     end
     puts "#{time} найдено #{clients.count} клиентов"
+
     puts "#{time} переходим по ссылке редактирования клиента и удаляем клиента"
-    clients.each do |i| #для каждого элемента массива выполняем
-      @driver.get("http://cp.abcp.ru/?page=customers&customerId=#{i}&action=editCustomer") #переходим по ссылке редактирования клиента
-      if @driver.find_elements(:xpath, "//*[contains(text(),'Системный код клиента:')]/../td[contains(text(),'#{i}')]").count == 1 #проверяем, что редактируем выбранного клиента
-        deleteButton = @driver.find_elements(:xpath, "//*[@value='Удалить учетную запись']")
-        if deleteButton.count == 1 #проверяем, что кнопка удаления есть на старнице
-          deleteButton[0].click #кликаем по кнопке
-          if @driver.find_elements(:xpath, "//*[contains(text(),'Вы действительно хотите удалить учётную запись пользователя?')]").count == 1 #проверяем, что появляется модальное окно
-            @driver.find_element(:xpath, "//*[@value='OK']").click #кликаем по кнопке "ОК" в модальном окне
-            if @driver.find_elements(:xpath, "//*[contains(text(),'Учетная запись клиента удалена!')]").count == 0 #если нет сообщения об успешном удалении
-              @errors += 1
-              puts 'Учетная запись клиента не удалена!'.colorize(:red)
-              raise 'Учетная запись клиента не удалена!'
+    while clients.count > 0 #актуально, когда хоть один клиент найден
+      clients.each do |i| #для каждого элемента массива выполняем
+        @driver.get("http://cp.abcp.ru#{@lan}/?page=customers&customerId=#{i}&action=editCustomer") #переходим по ссылке редактирования клиента
+        if @driver.find_elements(:xpath, "//*[contains(text(),'Системный код клиента:')]/../td[contains(text(),'#{i}')]").count == 1 #проверяем, что редактируем выбранного клиента
+          deleteButton = @driver.find_elements(:xpath, "//*[@value='Удалить учетную запись']")
+          if deleteButton.count == 1 #проверяем, что кнопка удаления есть на старнице
+            deleteButton[0].click #кликаем по кнопке
+            if @driver.find_elements(:xpath, "//*[contains(text(),'Вы действительно хотите удалить учётную запись пользователя?')]").count == 1 #проверяем, что появляется модальное окно
+              @driver.find_element(:xpath, "//*[@value='OK']").click #кликаем по кнопке "ОК" в модальном окне
+              if @driver.find_elements(:xpath, "//*[contains(text(),'Учетная запись клиента удалена!')]").count == 0 #если нет сообщения об успешном удалении
+                @errors += 1
+                puts 'Учетная запись клиента не удалена!'.colorize(:red)
+                raise 'Учетная запись клиента не удалена!'
+              else
+                puts "#{time} клиент #{i} удалён"
+              end
             else
-              puts "#{time} клиент #{i} удалён"
+              @errors += 1
+              puts 'Всплывающее окно не появилось!'.colorize(:red)
+              raise 'Всплывающее окно не появилось!'
             end
           else
             @errors += 1
-            puts 'Всплывающее окно не появилось!'.colorize(:red)
-            raise 'Всплывающее окно не появилось!'
+            puts 'Кнопка "Удалить" отсутствует!'.colorize(:red)
+            raise 'Кнопка "Удалить" отсутствует!'
           end
         else
           @errors += 1
-          puts 'Кнопка "Удалить" отсутствует!'.colorize(:red)
-          raise 'Кнопка "Удалить" отсутствует!'
+          puts "Выбран неверный id клиента #{i}!".colorize(:red)
+          raise "Выбран неверный id клиента #{i}!"
         end
-      else
-        @errors += 1
-        puts "Выбран неверный id клиента #{i}!".colorize(:red)
-        raise "Выбран неверный id клиента #{i}!"
       end
     end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+  end
+end
+
+#функция удаления заказов
+def deleteOrders(days)
+  puts "#{time} переходим на вкладку 'Заказы'"
+  @driver.find_element(:link, 'Заказы').click #переходим на вкладку "Заказы"
+  puts "#{time} переходим на вкладку 'Все заказы'"
+  @driver.find_element(:link, 'Все заказы').click #переходим на вкладку "Все заказы"
+  days += 1
+  date = (Time.now - 60*60*24*days).strftime('%d.%m.%Y') #дата, по которую необходимо удалять заказы
+  puts "#{time} вводим дату 'по'"
+  @driver.execute_script("document.getElementById('date_to').setAttribute('value', '#{date}');") #вводим в задизейбленное поле средствами js дату по
+  puts "#{time} кликаем по кнопке 'Применить фильтры'"
+  @driver.find_element(:xpath, '//*[@value="Применить фильтры"]').click #кликаем по кнопке "Применить фильтры"
+  sleep 2 #сек
+  puts "#{time} сохраняем id заказов на каждой из страниц"
+  orders = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").collect { |t| t.text } #сохраняем в массив id заказов на первой странице, преобразуя их в текст
+  while @driver.find_elements(:link, '>').count == 2 #до тех пор, пока есть кнопки следующей страницы
+    @driver.find_element(:link, '>').click unless @driver.find_elements(:link, '>').count == 0 #кликаем на ссылке следующей страницы, до тех пор, пока кнопки следующей страницы не пропадут
+    sleep 2 #сек
+    orders += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").collect { |t| t.text } #добавляем в массив id заказов на этой странице, преобразуя их в текст
+  end
+  puts "#{time} найдено #{orders.count} заказов"
+
+  puts "#{time} переходим по ссылке редактирования заказа и удаляем его"
+  while orders.count > 0 #актуально, когда хоть один заказ найден
+    orders.each do |i| #для каждого элемента массива выполняем
+      @driver.get("http://cp.abcp.ru#{@lan}/?page=orders&id_order_hidden=#{i}") #переходим по ссылке редактирования клиента
+      if @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[contains(text(),'#{i}')]").count == 1 #проверяем, что редактируем выбранного заказ от тестового клиента
+        @driver.find_element(:xpath, "//*[@title='Удалить заказ']").click #кликаем на кнопке "Удалить заказ"
+        @driver.switch_to.alert.accept #кликаем "ок" на всплывающем окне
+        if @driver.find_elements(:xpath, "//*[contains(text(),'Заказ #{i} успешно удалён.')]").count == 1 #проверяем, что заказ был успешно удалён
+          puts "#{time} заказ #{i} успешно удалён"
+        else
+          @errors += 1
+          puts 'Заказ не удалён!'.colorize(:red)
+          raise 'Заказ не удалён!'
+        end
+      else
+        @errors += 1
+        puts "Выбран неверный заказ #{i} или клиент!".colorize(:red)
+        raise "Выбран неверный заказ #{i} или клиент!"
+      end
+    end
   end
 end

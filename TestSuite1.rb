@@ -67,6 +67,8 @@ else
       #если установлен параметр запуска тестов в одном бразуере
       startBrowser(@browser[i]) if @options[:aio]
 
+      #market_email_notifications_for_comments(@browser[i])
+
       #выполняем тесты
       formycar_noindex_existence(@browser[i])
       formycar_no_redirect_and_available_results(@browser[i])
@@ -77,8 +79,6 @@ else
       gkOrder(@browser[i])
       franchiseeOrder(@browser[i])
       placeOrderFromFranchToGk(@browser[i])
-
-      #market_email_notifications_for_comments(@browser[i])
 
       #если установлен параметр запуска тестов в одном бразуере
       @driver.quit if @options[:aio]

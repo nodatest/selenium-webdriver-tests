@@ -18,7 +18,8 @@ def postActions(browser)
 
     @name = 'Удаление клиентов, которым > 2 дней'
     cpLoginFromRoot #логинимся на сайт из рута
-    deleteClients(3) #удаляем клиентов, которым > 2 дней
+    deleteClients(2) #удаляем тестовых клиентов, которым > 2 дней
+    deleteOrders(2) #удаляем заказы тестовых клиентов, которым > 2 дней
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
   end
