@@ -103,10 +103,14 @@ def search(brand, number)
     puts "#{time} вводим поисковый запрос в строку поиска"
     @driver.find_element(:id, 'pcode').send_keys(number) #вводим поисковый запрос в строку поиска
     puts "#{time} кликаем по кнопке 'Найти'"
-    @driver.find_element(:xpath, '//*[@alt="Найти"]').click #жмём кнопку "Найти"
+    if @driver.find_elements(:xpath, '//*[@alt="Найти"]').count > 0 #если есть кнопка "Найти"
+      @driver.find_element(:xpath, '//*[@alt="Найти"]').click #жмём кнопку "Найти"
+    else #иначе
+      @driver.find_element(:xpath, '//*[@alt="Начать поиск"]').click #жмём кнопку "Начать поиск" на 4mycar
+    end
     if @driver.find_elements(:xpath, '//*[contains(text(),"Цены и аналоги")]').count > 0
       puts "#{time} первый этап поиска: кликаем по ссылке 'Цены и аналоги'"
-      @driver.find_element(:xpath, "//*[contains(text(),'#{brand}')]/../..//*[contains(text(),'#{number}')]/..//*[contains(text(),'Цены и аналоги')]").click
+      @driver.find_element(:xpath, "//*[contains(text(),'#{brand}')]/../../../../../..//*[contains(text(),'#{number}')]/..//*[contains(text(),'Цены и аналоги')]").click
     else
       puts "#{time} второй этап поиска"
     end
@@ -243,11 +247,11 @@ def saveClients(days, *del)
     @driver.find_element(:xpath, '//*[@value="Найти"]').click #кликаем на кнопке "Найти"
     sleep 5 #сек
     puts "#{time} сохраняем id клиентов на каждой из страниц"
-    @clients = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #сохраняем массив id клиентов на первой странице, преобразуя в текст
+    @clients = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").map { |t| t.text } #сохраняем массив id клиентов на первой странице, преобразуя в текст
     while @driver.find_elements(:link, '>').count == 2 #до тех пор, пока есть кнопки следующей страницы
       @driver.find_element(:link, '>').click unless @driver.find_elements(:link, '>').count == 0 #кликаем на ссылке следующей страницы, до тех пор, пока кнопки следующей страницы не пропадут
       sleep 2 #сек
-      @clients += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").collect { |t| t.text } #добавляем в массив id клиентов на этой странице, преобразуя в текст
+      @clients += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../td[2]").map { |t| t.text } #добавляем в массив id клиентов на этой странице, преобразуя в текст
     end
     puts "#{time} найдено #{@clients.count} #{del}тестовых клиентов"
   rescue
@@ -313,11 +317,11 @@ def deleteOrders(days)
     @driver.find_element(:xpath, '//*[@value="Применить фильтры"]').click #кликаем по кнопке "Применить фильтры"
     sleep 2 #сек
     puts "#{time} сохраняем id заказов на каждой из страниц"
-    orders = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").collect { |t| t.text } #сохраняем в массив id заказов на первой странице, преобразуя их в текст
+    orders = @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").map { |t| t.text } #сохраняем в массив id заказов на первой странице, преобразуя их в текст
     while @driver.find_elements(:link, '>').count == 2 #до тех пор, пока есть кнопки следующей страницы
       @driver.find_element(:link, '>').click unless @driver.find_elements(:link, '>').count == 0 #кликаем на ссылке следующей страницы, до тех пор, пока кнопки следующей страницы не пропадут
       sleep 2 #сек
-      orders += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").collect { |t| t.text } #добавляем в массив id заказов на этой странице, преобразуя их в текст
+      orders += @driver.find_elements(:xpath, "//*[contains(text(),'test_user_')]/../..//*[@title='Подробнее']").map { |t| t.text } #добавляем в массив id заказов на этой странице, преобразуя их в текст
     end
     puts "#{time} найдено #{orders.count} заказов"
 
@@ -354,7 +358,7 @@ def deleteFranches(days)
     #@driver.get "http://cp.abcp.ru#{@lan}/?page=customers&franchises&dropCache" #заглушка для локального запуска с ворнингами
     @driver.find_element(:link, 'Франчайзи').click #переходим на вкладку "Франчайзи"
     if @driver.find_elements(:xpath, "//*[contains(text(),'test_')]").count > 0 #актуально, когда хоть один тестовый франч есть
-      franchClients = @driver.find_elements(:xpath, "//td[contains(text(),'test_')]/../td[4]").collect { |t| t.text } #сохраняем в массив id клиентов-основ франчей, преобразуя их в текст
+      franchClients = @driver.find_elements(:xpath, "//td[contains(text(),'test_')]/../td[4]").map { |t| t.text } #сохраняем в массив id клиентов-основ франчей, преобразуя их в текст
       puts "#{time} сохранено в массив #{franchClients.count} id клиентов-основ тестовых франчей"
 
       puts "#{time} сохраняем список зарегистрированных тестовых клиентов"
@@ -375,7 +379,7 @@ def deleteFranches(days)
         puts "#{time} сохраняем в массив список id франчей"
         if matchClients.count > 0 #если совпавших клиентов больше нуля
           matchClients.sort { |x, y| y <=> x }.each do |i| #для каждого элемента массива в обратном порядке выполняем
-            franches << @driver.find_elements(:xpath, "//*[contains(text(),'#{i}')]/../../td[5]").collect { |t| t.text } #сохраняем в массив id франчей, преобразуя их в текст
+            franches << @driver.find_elements(:xpath, "//*[contains(text(),'#{i}')]/../../td[5]").map { |t| t.text } #сохраняем в массив id франчей, преобразуя их в текст
           end
 
           puts "#{time} переходим в рут"
@@ -410,5 +414,178 @@ def deleteFranches(days)
     end
   rescue
     countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+  end
+end
+
+#функция создания/редактирования карточки поставщика 4mycar
+def editMarketCard
+  begin
+    puts "#{time} переходим на вкладку '4MyCar'"
+    @driver.find_element(:link, '4MyCar').click #переходим на вкладку "4MyCar"
+    puts "#{time} очищаем и вводим обязательные поля"
+    @driver.find_element(:id, 'name').clear #очищаем поле наименование организации
+    @driver.find_element(:id, 'name').send_keys('test_market') #вводим наименование организации
+    @driver.find_element(:id, 'email').clear #очищаем поле контактный email
+    @driver.find_element(:id, 'email').send_keys('test_market@selenium.noda.pro') #вводим контактный email
+    @driver.find_element(:xpath, '//*[contains(text(),"Москва")]').click #выбираем регион "Москва"
+    @driver.find_element(:id, 'street').clear #очищаем поле улица
+    @driver.find_element(:id, 'street').send_keys('Пушкина') #вводим улицу
+    @driver.find_element(:id, 'building').clear #очищаем поле номер дома
+    @driver.find_element(:id, 'building').send_keys('100') #вводим номер дома
+    @driver.find_element(:class, 'deleteValue').click #очищаем поле с номером телефона
+    @driver.find_element(:xpath, '//*[contains(text(),"Телефоны:")]/../td/div[1]/input[1]').send_keys('+7 (900) 123-45-67') #вводим номер телефона
+    @driver.find_element(:id, 'hasCars').click unless @driver.find_element(:id, 'hasCars').selected? #выбираем специализацию
+    @driver.find_element(:xpath, '//*[contains(text(),"Розница")]').click #выбираем опт
+    @driver.find_element(:id, 'hasCashPayment').click unless @driver.find_element(:id, 'hasCashPayment').selected? #выбираем наличные
+    @driver.find_element(:id, 'hasExWorks').click unless @driver.find_element(:id, 'hasExWorks').selected? #выбираем самовывоз
+    puts "#{time} сохраняем карточку автосервиса"
+    @driver.find_element(:xpath, '//*[@value="Сохранить"]').click #кликаем кнопку сохранить
+    if @driver.find_elements(:xpath, '//*[contains(text(),"Данные сохранены.")]').count == 0 #если нет сообщения о том, что данные успешно сохранены
+      @errors += 1
+      puts 'Карточка магазина не сохранена!'.colorize(:red)
+    end
+  rescue
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+  end
+end
+
+#функция редактирования сотрудников
+def editEmployee(employeeLastname, employeeRole, *employeeEmail)
+  begin
+    @driver.find_element(:name, 'last_name').clear #очищаем поле с фамилией сотрудника
+    @driver.find_element(:name, 'last_name').send_keys(employeeLastname) #вводим фамилию сотрудника
+
+    @driver.find_element(:name, 'email').clear #очищаем поле с email'ом сотрудника
+    @driver.find_element(:name, 'email').send_keys(employeeEmail) #вводим email сотрудника
+
+    @driver.find_element(:id, 'allow_login').click unless @driver.find_element(:id, 'allow_login').selected? #если не выбран чекбокс 'Разрешить сотруднику заходить на сайт', то выбираем его
+    @driver.find_element(:id, 'allow_login_to_cp').click unless @driver.find_element(:id, 'allow_login_to_cp').selected? #если не выбран чекбокс 'Разрешить сотруднику заходить в панель управления', то выбираем его
+
+    roles = @driver.find_elements(:xpath, '//tr[6]/td/label[*]') #получаем список ролей сотрудников
+    roles.each { |t| t.click if t.selected? } #cнимаем галку чекбокса для каждой отмеченной роли
+    @driver.find_element(:xpath, "//*[contains(., '#{employeeRole}')]").click #выставляем галку чекбокса нужной роли
+
+    @driver.find_element(:xpath, '//*[@value="Сохранить"]').click #жмём кнопку "Сохранить"
+    if @driver.find_elements(:xpath, '//*[contains(text(),"Информация о сотруднике сохранена.")]').count == 0 #если нет сообщения о том, что данные успешно сохранены, то
+      @errors += 1
+      puts 'Информация о сотруднике не сохранена.'.colorize(:red)
+    end
+=begin
+  rescue
+    countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+=end
+  end
+end
+
+#функция добавления email'ов сотрудников для оповещения
+def addAlertEmail(employeeLastnames, alertEmails)
+  begin
+    employeeLastnames.each do |i| #для каждого элемента массива фамилий сотрудников
+      @driver.find_element(:link, 'Добавить email').click #кликаем на ссылку добавить 'Добавить email'
+      @driver.find_element(:xpath, "//*[contains(text(),'#{i}')]").click #выбираем сотрудника
+      @driver.find_element(:name, 'email').send_keys(alertEmails[employeeLastnames.index(i)]) #вводим его email
+      @driver.find_element(:xpath, "//*[@value='Сохранить']").click #жмём кнопку "Сохранить"
+      if @driver.find_elements(:xpath, "//*[contains(text(),'Email сохранен.')]").count == 0 #если нет сообщения 'Email сохранен.', то
+        @errors += 1
+        puts 'Email не сохранён'.colorize(:red)
+      end
+    end
+=begin
+    rescue
+      countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+=end
+  end
+end
+
+
+#функция удаления email'ов сотрудников для оповещения
+def deleteAlertEmail(employeeLastnames)
+  begin
+    @driver.find_element(:link, 'Настройка').click #переходим по ссылке "Настройка"
+    @driver.find_element(:link, 'Управление почтой').click #переходим по ссылке "Управление почтой"
+
+    if @driver.find_elements(:xpath, "//*[contains(text(),'Сотрудник')]/../../tr[*]").count > 0 #если есть хотя бы один сотрудник, то
+      employeeLastnames.each do |i| #для каждого элемента массива фамилий сотрудников
+        while @driver.find_elements(:xpath, "//*[contains(text(),'#{i}')]").count > 0 #до тех пор, пока есть сотрудник с текущей фамилией
+          @driver.find_element(:xpath, "//*[contains(text(),'#{i}')]/../td[12]").click #кликаем на кнопке "Удалить"
+          if @driver.find_elements(:xpath, "//*[contains(text(),'Системное сообщение:')]").count == 1 #если есть модальное окно, то
+            @driver.find_element(:xpath, '//*[@value="OK"]').click #кликаем по кнопке "ОК" модального окна
+            unless @driver.find_elements(:xpath, "//*[contains(text(),'Email удален.')]").count == 1 #если нет сообщения 'Email удален.', то
+              @errors += 1
+              puts 'Email не удалён'.colorize(:red)
+              raise 'Email не удалён'
+            end
+          else #иначе
+            @errors += 1
+            puts 'Всплывающее окно подтверждения удаления emaila сотрудника отсутствует'.colorize(:red)
+            raise 'Всплывающее окно подтверждения удаления emaila сотрудника отсутствует'
+          end
+        end
+      end
+    end
+=begin
+    rescue
+      countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+=end
+  end
+end
+
+
+#функция добавлия или редактирования сотрудников
+def addOrEditEmployees(operation, employeeLastnames, employeeRoles, employeeEmails)
+  begin
+    unless employeeEmails.empty? #если массив совпавших email'ов не пустой, то
+      employeeEmails.each do |i| #для каждого элемента массива
+        case operation #выбираем режим
+          when 'edit' #редактирование
+            @driver.find_element(:xpath, "//*[contains(text(),'#{i}')]/..//*[@title='Редактировать информацию о сотруднике']").click #кликаем на по кнопке 'Редактировать информацию о сотруднике'
+          when 'add' #добавлнение
+            @driver.find_element(:link, 'Добавить сотрудника').click #кликаем по ссылке "Добавить сотрудника"
+        end
+        a = employeeEmails.index(i) #получаем текущий индекс
+        editEmployee(employeeLastnames[a], employeeRoles[a], employeeEmails[a]) #редактируем карточку сотрудника
+        @driver.find_element(:link, 'Персонал').click #переходим по ссылке "Персонал"
+      end
+    end
+=begin
+    rescue
+      countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+=end
+  end
+end
+
+
+#функция восстановления удалённых сотрудников
+def recoverEmployees(employeeEmails)
+  begin
+    @driver.find_element(:link, 'Персонал').click #переходим на ссылке "Персонал"
+    @driver.find_element(:link, 'Удаленные').click #переходим на вкладку "Удалённые"
+
+    deleteEmployeeEmails = @driver.find_elements(:xpath, '//tr[*]/td[5]').each.map { |t| t.text } #сохраняем массив email'ов удалённых сотрудников
+    recoverEmployeeEmails = employeeEmails & deleteEmployeeEmails #сохраняем массив из совпавших email'ов удалённых и наших тестовых
+
+    unless recoverEmployeeEmails.empty? #если массив совпавших email'ов не пустой, то
+      @driver.find_element(:link, 'Персонал').click #переходим на ссылке "Персонал"
+      @driver.find_element(:link, 'Удаленные').click #переходим на вкладку "Удалённые"
+      recoverEmployeeEmails.each do |i| #для каждого элемента массива
+        @driver.find_element(:xpath, "//*[contains(text(),'#{i}')]/..//*[@title='Восстановить сотрудника']").click #кликаем на по кнопке 'Восстановить сотрудника'
+        if @driver.find_elements(:xpath, "//*[contains(text(),'Вы действительно хотите восстановить сотрудника?')]").count == 1 #если есть одно всплывающее окно, то
+          @driver.find_element(:xpath, '//*[@value="OK"]').click #кликаем по кнопке "ОК" модального окна
+          if @driver.find_elements(:xpath, "//*[contains(text(),'Информация о сотруднике успешно восстановлена.')]").count == 0 #если отсутствует сообщение об успешном восстановлении сотрудника, то
+            @errors += 1
+            puts 'Сотрудник не был восстановлен!'.colorize(:red)
+            @driver.get "http://cp.abcp.ru#{@lan}/?page=staff" #переходим по ссылке "Персонал"
+            @driver.find_element(:link, 'Удаленные').click #переходим на вкладку "Удалённые"
+          end
+        else #иначе
+          @errors += 1
+          puts 'Всплывающее окно подтверждения восстановления сотрудника отсутствует'.colorize(:red)
+        end
+      end
+    end
+=begin
+    rescue
+      countErrorsTakeScreenshot #подсчитываем ошибки и делаем скриншот
+=end
   end
 end

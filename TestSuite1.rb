@@ -15,6 +15,7 @@ require_relative 'franchisee.order'
 require_relative 'place.order.from.franch.to.gk'
 require_relative 'post.actions'
 require_relative 'market.email.notifications.for.comments'
+require_relative '4mycar.order'
 
 #выводим ошибки ruby в файл
 $stderr = File.open('../selenium-webdriver-logs/!errors_log.txt', 'w')
@@ -69,7 +70,9 @@ else
 
       #выполняем тесты
 
-      #market_email_notifications_for_comments(@browser[i])
+      formycar_order(@browser[i])
+
+      market_email_notifications_for_comments(@browser[i])
 
       formycar_noindex_existence(@browser[i])
       formycar_no_redirect_and_available_results(@browser[i])

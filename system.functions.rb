@@ -2,6 +2,7 @@
 # encoding: utf-8
 require 'optparse'
 require 'logger'
+require 'mysql'
 =begin
 require 'unicode'
 
@@ -148,5 +149,30 @@ def deleteScreenshots(path, days)
   files.each do |i|
     file = "#{path}/#{i}" #прибавляем к имени путь
     File.delete(file) if Time.now - File.ctime(file) > 60*60*24*days #удаляем файл, если он дата его создания больше days дней
+  end
+end
+
+#функция получения данных из БД
+def dbConnector(dbparams, query)
+  begin
+
+    con = Mysql.new dbparams['host'], dbparams['login'], dbparams['password'], dbparams['database']
+
+    rs = con.query(query)
+    @n_rows = rs.num_rows
+
+    puts "There are #{@n_rows} rows in the result set"
+
+    @n_rows.times do
+      puts rs.fetch_row.join("\s")
+    end
+
+
+  rescue Mysql::Error => e
+    puts e.errno
+    puts e.error
+
+  ensure
+    con.close if con
   end
 end
